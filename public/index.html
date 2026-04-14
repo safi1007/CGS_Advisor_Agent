@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>CGS Advisor Agent</title>
+    <link rel="stylesheet" href="/style.css" />
+  </head>
+  <body>
+    <main class="app-shell">
+      <section class="hero">
+        <p class="eyebrow">CGS Transformation Advisor</p>
+        <h1>Assess your transformation readiness</h1>
+        <p class="intro">
+          Share your challenge and the advisor will guide you through a short
+          readiness assessment, one question at a time.
+        </p>
+      </section>
+
+      <section class="chat-panel">
+        <div id="messages" class="messages" aria-live="polite"></div>
+
+        <form id="chat-form" class="composer">
+          <label class="sr-only" for="message-input">Your message</label>
+          <textarea
+            id="message-input"
+            name="message"
+            rows="3"
+            placeholder="Describe what transformation challenge you're dealing with..."
+            required
+          ></textarea>
+          <div class="composer-actions">
+            <p id="status" class="status">Ready when you are.</p>
+            <button id="send-button" type="submit">Send</button>
+          </div>
+        </form>
+      </section>
+    </main>
+
+    <script type="module" src="/app.js"></script>
+  </body>
+</html>
