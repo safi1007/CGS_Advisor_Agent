@@ -1,8 +1,8 @@
-import { runAssessment } from "./agent/assessment_flow.js";
+import { runProjectMemory } from "./agent/Post-engagment/index.js";
 
 const history = [
   { role: "user", content: "Hi, I'd like to assess my transformation readiness" }
 ];
 
-const response = await runAssessment(history);
+const response = await runProjectMemory(history);
 console.log("Agent says:", response);
