@@ -1,5 +1,5 @@
 import express from "express";
-import { runProjectMemory } from "./agent/Post-engagment/index.js";
+import chatHandler from "./api/chat.js";
 import { config } from "dotenv";
 
 config();
@@ -11,25 +11,11 @@ const MAX_PORT_ATTEMPTS = 10;
 app.use(express.json());
 
 // Serve the UI files
-app.use(express.static("ui"));
+app.use(express.static("public"));
 
 // The chat endpoint — UI calls this, it calls Claude
-app.post("/chat", async (req, res) => {
-  try {
-    const { messages } = req.body;
-
-    if (!Array.isArray(messages) || messages.length === 0) {
-      return res.status(400).json({
-        error: "Request body must include a non-empty messages array",
-      });
-    }
-
-    const reply = await runProjectMemory(messages);
-    res.json({ reply });
-  } catch (error) {
-    console.error("Chat request failed:", error);
-    res.status(500).json({ error: "Something went wrong" });
-  }
+app.post("/api/chat", async (req, res) => {
+  return chatHandler(req, res);
 });
 
 process.on("unhandledRejection", (error) => {
