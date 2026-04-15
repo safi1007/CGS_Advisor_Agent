@@ -12,10 +12,12 @@ app.use((req, res, next) => {
   if (req.method === "OPTIONS") return res.sendStatus(200);
   next();
 });
-const HOST = process.env.HOST ?? "127.0.0.1";
-const PORT = Number.parseInt(process.env.PORT ?? "3000", 10);
-const MAX_PORT_ATTEMPTS = 10;
+const PORT = process.env.PORT || 3000;
 app.use(express.json());
+
+app.get("/health", (req, res) => {
+  res.status(200).json({ status: "ok" });
+});
 
 import { generateProgressQuestions, generateProgressReport } 
   from "./agent/post-engagement/progress_report.js";
@@ -114,30 +116,6 @@ process.on("uncaughtException", (error) => {
   process.exit(1);
 });
 
-function startServer(port, attemptsRemaining = MAX_PORT_ATTEMPTS) {
-  const server = app.listen(port, HOST);
-
-  server.on("listening", () => {
-    console.log(`CGS Advisor Agent running at http://${HOST}:${port}`);
-  });
-
-  server.on("error", (error) => {
-    const canRetry =
-      attemptsRemaining > 1 &&
-      (error.code === "EADDRINUSE" || error.code === "EPERM");
-
-    if (canRetry) {
-      const nextPort = port + 1;
-      console.error(
-        `Port ${port} is unavailable (${error.code}). Retrying on ${nextPort}...`
-      );
-      startServer(nextPort, attemptsRemaining - 1);
-      return;
-    }
-
-    console.error("Server failed to start:", error);
-    process.exit(1);
-  });
-}
-
-startServer(PORT);
+app.listen(PORT, "0.0.0.0", () => {
+  console.log(`CGS Momentum running on port ${PORT}`);
+});
