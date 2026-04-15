@@ -4,6 +4,7 @@ import { fileURLToPath, pathToFileURL } from "url";
 
 import {
   buildPostEngagementContext,
+  generateSessionOpener,
   loadPostEngagementKnowledge,
   runProjectMemory,
 } from "./project_memory.js";
@@ -40,6 +41,7 @@ const __dirname = path.dirname(__filename);
 
 export {
   buildPostEngagementContext,
+  generateSessionOpener,
   loadPostEngagementKnowledge,
   runProjectMemory,
   generateProgressQuestions,
