@@ -5,20 +5,22 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { config } from "dotenv";
-import { loadKnowledgeBase, buildSystemPrompt } from "./knowledge_loader.js";
+import {
+  buildSystemPrompt,
+  loadKnowledgeBase,
+} from "./knowledge_loader.js";
 config();
 
 const client = new Anthropic();
 
-export async function generateDisruptionAlert(clientId) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+export async function generateDisruptionAlert() {
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-20250514",
     max_tokens: 1500,
     system: systemPrompt,
-    // Enable web search so the alert uses real live signals
     tools: [{
       type: "web_search_20250305",
       name: "web_search"
@@ -27,11 +29,11 @@ export async function generateDisruptionAlert(clientId) {
       role: "user",
       content: `Search for the latest competitive and industry 
       disruption signals relevant to this client's sector and 
-      transformation programme. 
+      transformation programme.
 
       Search for:
       1. Recent news about automotive software-defined vehicle 
-         developments (last 30 days)
+         developments from the last 30 days
       2. Any announcements from Aptiv, Magna, Bosch, or Mobileye 
          about SDV capabilities
       3. Any Ford, BMW, or Stellantis supplier technology announcements
@@ -50,10 +52,9 @@ export async function generateDisruptionAlert(clientId) {
     }]
   });
 
-  // Handle web search tool use in the response
   const fullResponse = response.content
-    .map(block => block.type === "text" ? block.text : "")
-    .filter(Boolean)
+    .filter((block) => block.type === "text")
+    .map((block) => block.text)
     .join("\n");
 
   return fullResponse || "No significant disruption signals detected this month.";

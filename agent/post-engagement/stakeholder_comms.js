@@ -5,7 +5,10 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { config } from "dotenv";
-import { loadKnowledgeBase, buildSystemPrompt } from "./knowledge_loader.js";
+import {
+  buildSystemPrompt,
+  loadKnowledgeBase,
+} from "./knowledge_loader.js";
 config();
 
 const client = new Anthropic();
@@ -26,23 +29,18 @@ export function detectStakeholderChallenge(message) {
     "get buy-in",
     "win over",
     "persuade",
-    "align",
     "struggling with",
     "difficult conversation",
-    "talk to"
   ];
   const lower = message.toLowerCase();
-  return triggers.some(trigger => lower.includes(trigger));
+  return triggers.some((trigger) => lower.includes(trigger));
 }
 
 // ── Generate clarifying questions about the stakeholder ──────
 
-export async function generateStakeholderQuestions(
-  clientId,
-  challengeContext
-) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+export async function generateStakeholderQuestions(challengeContext) {
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-20250514",
@@ -55,15 +53,16 @@ export async function generateStakeholderQuestions(
 
       Before drafting the communication strategy, ask exactly 3 
       questions that will allow you to tailor the approach. 
-      Check the client context file — if this stakeholder is 
-      already documented (e.g. Linda Petersen, Marcus Webb), 
-      use what you know and ask only about what has changed.
+
+      The acknowledgment should reference either Dominant Logic Inertia 
+      or Structural Inertia from the CGS framework based on what this 
+      challenge sounds like.
 
       Return ONLY a JSON object:
       {
         "acknowledgment": "one sentence showing you understand 
-          the challenge and connecting it to a CGS framework 
-          (Dominant Logic or Structural Inertia)",
+          the challenge and connecting it to either Dominant Logic 
+          Inertia or Structural Inertia",
         "questions": [
           "Question 1 — about the stakeholder's specific concern",
           "Question 2 — about what has already been tried",
@@ -92,12 +91,11 @@ export async function generateStakeholderQuestions(
 // ── Generate the stakeholder communication package ───────────
 
 export async function generateStakeholderComms(
-  clientId,
   challengeContext,
   questionsAndAnswers
 ) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
   const qaText = questionsAndAnswers.map((qa, i) =>
     `Q${i + 1}: ${qa.question}\nA: ${qa.answer}`
@@ -125,9 +123,9 @@ export async function generateStakeholderComms(
       ---
 
       ## Aria's Diagnosis
-      [One paragraph. What type of inertia is this — Dominant Logic 
-      or Structural? What is driving it based on what the client 
-      described? Connect to specific CGS framework language.]
+      [One paragraph. Name the inertia type explicitly as either 
+      Dominant Logic Inertia or Structural Inertia. Explain what 
+      is driving it based on what the client described.]
 
       ## Recommended Approach
       [2-3 paragraphs. Which CGS inertia removal tactics apply here. 
@@ -146,7 +144,7 @@ export async function generateStakeholderComms(
       using the client's voice not consultant-speak. 
       Should be sendable as-is or with minor edits.]
 
-      ## If the Conversation Gets Difficult
+      ## If The Conversation Gets Difficult
       [2-3 specific responses to likely pushback. 
       Format: "If they say X, you can respond with Y"]
 

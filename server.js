@@ -25,71 +25,58 @@ import { generateDisruptionAlert }
   from "./agent/post-engagement/disruption_alert.js";
 
 // Capability 1 — Progress Report
-app.post("/progress-questions", async (req, res) => {
-  const { clientId = "meridian_auto" } = req.body;
-  const result = await generateProgressQuestions(clientId);
+app.post("/progress-questions", async (_req, res) => {
+  const result = await generateProgressQuestions();
   res.json(result);
 });
 
 app.post("/progress-report", async (req, res) => {
-  const { clientId = "meridian_auto", questionsAndAnswers } = req.body;
-  const report = await generateProgressReport(clientId, questionsAndAnswers);
+  const { questionsAndAnswers } = req.body;
+  const report = await generateProgressReport(questionsAndAnswers);
   res.json({ report });
 });
 
 // Capability 2 — Meeting Prep
 app.post("/meeting-questions", async (req, res) => {
-  const { clientId = "meridian_auto", meetingContext } = req.body;
-  const result = await generateMeetingQuestions(clientId, meetingContext);
+  const { meetingContext } = req.body;
+  const result = await generateMeetingQuestions(meetingContext);
   res.json(result);
 });
 
 app.post("/meeting-briefing", async (req, res) => {
-  const { clientId = "meridian_auto", meetingContext, 
-    questionsAndAnswers } = req.body;
-  const briefing = await generateMeetingBriefing(
-    clientId, meetingContext, questionsAndAnswers
-  );
+  const { meetingContext, questionsAndAnswers } = req.body;
+  const briefing = await generateMeetingBriefing(meetingContext, questionsAndAnswers);
   res.json({ briefing });
 });
 
 // Capability 3 — Stakeholder Comms
 app.post("/stakeholder-questions", async (req, res) => {
-  const { clientId = "meridian_auto", challengeContext } = req.body;
-  const result = await generateStakeholderQuestions(
-    clientId, challengeContext
-  );
+  const { challengeContext } = req.body;
+  const result = await generateStakeholderQuestions(challengeContext);
   res.json(result);
 });
 
 app.post("/stakeholder-comms", async (req, res) => {
-  const { clientId = "meridian_auto", challengeContext, 
-    questionsAndAnswers } = req.body;
-  const comms = await generateStakeholderComms(
-    clientId, challengeContext, questionsAndAnswers
-  );
+  const { challengeContext, questionsAndAnswers } = req.body;
+  const comms = await generateStakeholderComms(challengeContext, questionsAndAnswers);
   res.json({ comms });
 });
 
 // Capability 4 — Health Check
-app.post("/health-questions", async (req, res) => {
-  const { clientId = "meridian_auto" } = req.body;
-  const result = await generateCheckInQuestions(clientId);
+app.post("/health-questions", async (_req, res) => {
+  const result = await generateCheckInQuestions();
   res.json(result);
 });
 
 app.post("/health-score", async (req, res) => {
-  const { clientId = "meridian_auto", questionsAndAnswers } = req.body;
-  const scores = await scoreCheckInAnswers(clientId, questionsAndAnswers);
+  const { questionsAndAnswers } = req.body;
+  const scores = await scoreCheckInAnswers(questionsAndAnswers);
   res.json(scores);
 });
 
 app.post("/health-report", async (req, res) => {
-  const { clientId = "meridian_auto", scores, 
-    questionsAndAnswers, previousScore = 25 } = req.body;
-  const result = await generateHealthReport(
-    clientId, scores, questionsAndAnswers, previousScore
-  );
+  const { scores, questionsAndAnswers, previousScore = 25 } = req.body;
+  const result = await generateHealthReport(scores, questionsAndAnswers, previousScore);
   res.json(result);
 });
 
@@ -98,9 +85,8 @@ app.get("/health-history/:clientId", (req, res) => {
 });
 
 // Capability 5 — Disruption Alert
-app.post("/disruption-alert", async (req, res) => {
-  const { clientId = "meridian_auto" } = req.body;
-  const alert = await generateDisruptionAlert(clientId);
+app.post("/disruption-alert", async (_req, res) => {
+  const alert = await generateDisruptionAlert();
   res.json({ alert });
 });
 
