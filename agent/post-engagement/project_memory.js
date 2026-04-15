@@ -157,17 +157,15 @@ export async function generateSessionOpener() {
   const knowledge = loadKnowledgeBase();
   const systemPrompt = buildSystemPrompt(knowledge);
 
-  const openerPrompt = `Generate a brief, personalised opening message for 
-when the client opens CGS Momentum today. 
+  const openerPrompt = `Generate a personalised 2-3 sentence opening message 
+for James Whitfield at Meridian Automotive Group opening CGS Momentum today.
 
 The message should:
-- Welcome them back by name as James Whitfield at Meridian Automotive Group
-- Reference one specific, current thing from their transformation 
-  (the most pressing upcoming milestone or risk from their roadmap)
-- Ask one focused question that invites them to share what is on 
-  their mind today
-- Be 3-4 sentences maximum
+- Reference one specific upcoming or overdue milestone from the roadmap by name
+- Mention today's date context naturally
+- End with one focused question inviting him to share what is on his mind
 - Sound like a trusted advisor, not a chatbot greeting
+- Be 2-3 sentences maximum
 
 Do not use generic phrases like "How can I help you today?" 
 Be specific to their situation.`;
@@ -175,7 +173,7 @@ Be specific to their situation.`;
   try {
     const response = await client.messages.create({
       model: "claude-sonnet-4-20250514",
-      max_tokens: 300,
+      max_tokens: 200,
       system: systemPrompt,
       messages: [{ role: "user", content: openerPrompt }],
     });
