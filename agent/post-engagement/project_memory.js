@@ -42,7 +42,7 @@ function loadFile(filePath) {
   }
 }
 
-function loadKnowledgeBase() {
+export function loadPostEngagementKnowledge(clientId = "meridian_auto") {
   // ── CGS Framework Files (same for every client) ──────────
   const frameworkFiles = [
     "knowledge-base/frameworks/cgs_transformation_framework.md",
@@ -222,6 +222,10 @@ Remember: You are Aria. You know this client. You were there.
 Respond as the trusted advisor you are.`;
 }
 
+export function buildPostEngagementContext(clientId = "meridian_auto") {
+  return loadPostEngagementKnowledge(clientId);
+}
+
 // ============================================================
 // STEP 3: RUN THE CONVERSATION
 // Sends the conversation history plus all knowledge to Claude
@@ -230,7 +234,7 @@ Respond as the trusted advisor you are.`;
 
 export async function runProjectMemoryQA(clientId, conversationHistory) {
   // Load all knowledge for this client
-  const knowledge = loadKnowledgeBase(clientId);
+  const knowledge = loadPostEngagementKnowledge(clientId);
 
   // Build the system prompt with all knowledge embedded
   const systemPrompt = buildSystemPrompt(clientId, knowledge);
@@ -257,6 +261,14 @@ export async function runProjectMemoryQA(clientId, conversationHistory) {
     console.error("Error calling Claude API:", error.message);
     throw error;
   }
+}
+
+export async function runProjectMemory(
+  conversationHistory,
+  clientId = "meridian_auto"
+) {
+  const result = await runProjectMemoryQA(clientId, conversationHistory);
+  return result.reply;
 }
 
 // ============================================================
