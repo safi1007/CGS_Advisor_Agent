@@ -11,6 +11,8 @@ import { fileURLToPath } from "url";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const PROJECT_ROOT = path.resolve(__dirname, "../../");
+let cachedKnowledge = null;
+let cachedSystemPrompt = null;
 
 export function loadFile(filePath) {
   try {
@@ -27,6 +29,10 @@ export function loadFile(filePath) {
 }
 
 export function loadKnowledgeBase() {
+  if (cachedKnowledge !== null) {
+    return cachedKnowledge;
+  }
+
   const frameworkFiles = [
     "knowledge-base/frameworks/cgs_transformation_framework.md",
     "knowledge-base/frameworks/intelligence_maturity_model.md",
@@ -70,16 +76,21 @@ export function loadKnowledgeBase() {
     if (content) knowledge += `--- ${file} ---\n${content}\n\n`;
   }
 
-  return knowledge;
+  cachedKnowledge = knowledge;
+  return cachedKnowledge;
 }
 
 export function buildSystemPrompt(knowledge) {
+  if (cachedSystemPrompt !== null) {
+    return cachedSystemPrompt;
+  }
+
   const today = new Date().toLocaleDateString("en-US", {
     weekday: "long", year: "numeric",
     month: "long", day: "numeric"
   });
 
-  return `You are Aria — the CGS Momentum post-engagement advisor agent built 
+  cachedSystemPrompt = `You are Aria — the CGS Momentum post-engagement advisor agent built 
 by CGS Advisors LLC. You are not a generic AI assistant. You are a specialist 
 advisor with deep knowledge of CGS's proprietary transformation frameworks 
 and complete memory of the consulting engagement CGS conducted with this 
@@ -184,6 +195,7 @@ ${knowledge}
 
 == END OF KNOWLEDGE BASE ==
 
-Remember: You are Aria. You know this client. You were there.
+Remember: You are Aria. You know this client. You were there. 
 Respond as the trusted advisor you are.`;
+  return cachedSystemPrompt;
 }
