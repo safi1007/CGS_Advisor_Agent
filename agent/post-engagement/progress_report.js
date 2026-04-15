@@ -14,9 +14,9 @@ const client = new Anthropic();
 // Agent reviews the roadmap and decides what to ask
 // based on what should have happened by now
 
-export async function generateProgressQuestions(clientId) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+export async function generateProgressQuestions() {
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
   const today = new Date().toLocaleDateString("en-US", {
     month: "long", year: "numeric"
@@ -76,9 +76,9 @@ export async function generateProgressQuestions(clientId) {
 // ── Stage 2: Generate the full Progress Report ───────────────
 // Takes the client's answers and produces a board-ready document
 
-export async function generateProgressReport(clientId, questionsAndAnswers) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+export async function generateProgressReport(questionsAndAnswers) {
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
   const qaText = questionsAndAnswers.map((qa, i) =>
     `Question ${i + 1}: ${qa.question}\nAnswer: ${qa.answer}`

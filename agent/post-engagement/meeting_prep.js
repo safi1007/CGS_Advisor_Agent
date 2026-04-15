@@ -5,7 +5,10 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { config } from "dotenv";
-import { loadKnowledgeBase, buildSystemPrompt } from "./knowledge_loader.js";
+import {
+  buildSystemPrompt,
+  loadKnowledgeBase,
+} from "./knowledge_loader.js";
 config();
 
 const client = new Anthropic();
@@ -27,17 +30,17 @@ export function detectMeetingTrigger(message) {
     "meeting in",
     "meeting next",
     "meeting tomorrow",
-    "meeting this week"
+    "meeting this week",
   ];
   const lower = message.toLowerCase();
-  return triggers.some(trigger => lower.includes(trigger));
+  return triggers.some((trigger) => lower.includes(trigger));
 }
 
 // ── Generate the 4 clarifying questions ──────────────────────
 
-export async function generateMeetingQuestions(clientId, meetingContext) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+export async function generateMeetingQuestions(meetingContext) {
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-20250514",
@@ -76,8 +79,8 @@ export async function generateMeetingQuestions(clientId, meetingContext) {
         "Who specifically will be in the room — board members, Northlake, or both?",
         "Is there a specific decision or approval you need from this meeting?",
         "Any sensitivities or concerns from previous board conversations I should be aware of?",
-        "Any significant programme developments since we last spoke that should be highlighted?"
-      ]
+        "Any significant developments since the last update that should be highlighted?"
+      ],
     };
   }
 }
@@ -85,12 +88,11 @@ export async function generateMeetingQuestions(clientId, meetingContext) {
 // ── Generate the full board briefing document ────────────────
 
 export async function generateMeetingBriefing(
-  clientId,
   meetingContext,
   questionsAndAnswers
 ) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
   const qaText = questionsAndAnswers.map((qa, i) =>
     `Q${i + 1}: ${qa.question}\nA: ${qa.answer}`
@@ -102,7 +104,7 @@ export async function generateMeetingBriefing(
     system: systemPrompt,
     messages: [{
       role: "user",
-      content: `Generate a complete board meeting briefing document.
+      content: `Generate a complete board meeting briefing document in markdown.
 
       MEETING CONTEXT: ${meetingContext}
 
@@ -117,7 +119,7 @@ export async function generateMeetingBriefing(
       - Written in the voice of senior management presenting to the board
 
       Structure:
-      
+
       # Board Briefing: Digital Transformation Progress
       ## [Company] | [Date] | CONFIDENTIAL
 
@@ -141,7 +143,7 @@ export async function generateMeetingBriefing(
       ## Top Three Risks
       [Three risks with likelihood, impact, mitigation, owner]
 
-      ## Decisions Required from This Meeting
+      ## Decisions Required
       [Numbered list of what the board needs to decide or endorse.
       If no decisions required, state that explicitly.]
 

@@ -5,7 +5,10 @@
 
 import Anthropic from "@anthropic-ai/sdk";
 import { config } from "dotenv";
-import { loadKnowledgeBase, buildSystemPrompt } from "./knowledge_loader.js";
+import {
+  buildSystemPrompt,
+  loadKnowledgeBase,
+} from "./knowledge_loader.js";
 config();
 
 const client = new Anthropic();
@@ -18,31 +21,37 @@ export const MERIDIAN_HEALTH_HISTORY = [
   {
     month: "October 2024",
     overall: 25,
-    strategy: 30, people: 10, process: 30, technology: 30,
-    label: "Early Stage"
-  },
-  {
-    month: "January 2026",
-    overall: 25,
-    strategy: 30, people: 10, process: 30, technology: 30,
+    strategy: 30,
+    people: 10,
+    process: 30,
+    technology: 30,
     label: "Early Stage"
   },
   {
     month: "February 2026",
     overall: 25,
-    strategy: 30, people: 10, process: 30, technology: 30,
+    strategy: 30,
+    people: 10,
+    process: 30,
+    technology: 30,
     label: "Early Stage — Engagement Close"
   },
   {
     month: "March 2026",
     overall: 27,
-    strategy: 30, people: 10, process: 30, technology: 38,
+    strategy: 30,
+    people: 10,
+    process: 30,
+    technology: 38,
     label: "Early Stage"
   },
   {
     month: "April 2026",
     overall: 29,
-    strategy: 30, people: 10, process: 30, technology: 45,
+    strategy: 30,
+    people: 10,
+    process: 30,
+    technology: 45,
     label: "Developing"
   }
 ];
@@ -50,7 +59,7 @@ export const MERIDIAN_HEALTH_HISTORY = [
 // ── Score conversion ──────────────────────────────────────────
 
 export function levelToPoints(level) {
-  const map = { "A1": 10, "A2": 30, "A3": 55, "A4": 80, "A5": 100 };
+  const map = { A1: 10, A2: 30, A3: 55, A4: 80, A5: 100 };
   return map[level] || 10;
 }
 
@@ -65,9 +74,9 @@ export function pointsToLabel(score) {
 
 // ── Stage 1: Generate the 5 check-in questions ───────────────
 
-export async function generateCheckInQuestions(clientId) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+export async function generateCheckInQuestions() {
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-20250514",
@@ -84,7 +93,7 @@ export async function generateCheckInQuestions(clientId) {
       2. People dimension — headcount progress and CDO status
       3. Process dimension — programme workflow and bottlenecks
       4. Technology dimension — AWS, OTA, Ford VIP progress
-      5. Conviction signal — leadership energy on a 1-10 scale
+      5. Conviction dimension — must explicitly ask for a score from 1 to 10
 
       Make the questions specific to this client's current roadmap 
       phase. They should be conversational, not survey-like.
@@ -100,13 +109,13 @@ export async function generateCheckInQuestions(clientId) {
             "question": "question text here"
           },
           {
-            "id": "people", 
+            "id": "people",
             "dimension": "People",
             "question": "question text here"
           },
           {
             "id": "process",
-            "dimension": "Process", 
+            "dimension": "Process",
             "question": "question text here"
           },
           {
@@ -132,11 +141,31 @@ export async function generateCheckInQuestions(clientId) {
     return {
       opening: "Time for your monthly Transformation Health Check-in. Five quick questions.",
       questions: [
-        { id: "strategy", dimension: "Strategy", question: "How aligned is the leadership team on the transformation direction this month?" },
-        { id: "people", dimension: "People", question: "Where does your software engineering headcount stand, and any CDO update?" },
-        { id: "process", dimension: "Process", question: "Are the CVCP workstreams running smoothly or are there bottlenecks?" },
-        { id: "technology", dimension: "Technology", question: "How are the AWS platform and OTA development progressing?" },
-        { id: "conviction", dimension: "Conviction", question: "On a scale of 1-10, how would you rate leadership energy and commitment to the transformation this month — and what's driving that number?" }
+        {
+          id: "strategy",
+          dimension: "Strategy",
+          question: "How aligned is the leadership team on the transformation direction this month?"
+        },
+        {
+          id: "people",
+          dimension: "People",
+          question: "Where does your software engineering headcount stand, and any CDO update?"
+        },
+        {
+          id: "process",
+          dimension: "Process",
+          question: "Are the CVCP workstreams running smoothly or are there bottlenecks?"
+        },
+        {
+          id: "technology",
+          dimension: "Technology",
+          question: "How are the AWS platform and OTA development progressing?"
+        },
+        {
+          id: "conviction",
+          dimension: "Conviction",
+          question: "On a scale of 1-10, how would you rate leadership energy and commitment to the transformation this month — and what's driving that number?"
+        }
       ]
     };
   }
@@ -144,11 +173,11 @@ export async function generateCheckInQuestions(clientId) {
 
 // ── Stage 2: Score the answers ────────────────────────────────
 
-export async function scoreCheckInAnswers(clientId, questionsAndAnswers) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+export async function scoreCheckInAnswers(questionsAndAnswers) {
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
-  const qaText = questionsAndAnswers.map(qa =>
+  const qaText = questionsAndAnswers.map((qa) =>
     `Dimension: ${qa.dimension}\nQuestion: ${qa.question}\nAnswer: ${qa.answer}`
   ).join("\n\n");
 
@@ -177,7 +206,7 @@ export async function scoreCheckInAnswers(clientId, questionsAndAnswers) {
         "people": { "level": "A1", "points": 10, "rationale": "..." },
         "process": { "level": "A2", "points": 30, "rationale": "..." },
         "technology": { "level": "A2", "points": 30, "rationale": "..." },
-        "conviction": { "score": 7, "signal": "healthy/fragile/concerning" },
+        "conviction": { "score": 7, "signal": "healthy" },
         "overall": 25,
         "label": "Early Stage",
         "escalationRequired": false,
@@ -192,11 +221,30 @@ export async function scoreCheckInAnswers(clientId, questionsAndAnswers) {
     return JSON.parse(clean);
   } catch (error) {
     return {
-      strategy: { level: "A2", points: 30, rationale: "Leadership broadly aligned." },
-      people: { level: "A1", points: 10, rationale: "CDO not yet hired." },
-      process: { level: "A2", points: 30, rationale: "CVCP running with minor delays." },
-      technology: { level: "A2", points: 30, rationale: "AWS contract in progress." },
-      conviction: { score: 7, signal: "healthy" },
+      strategy: {
+        level: "A2",
+        points: 30,
+        rationale: "Leadership broadly aligned."
+      },
+      people: {
+        level: "A1",
+        points: 10,
+        rationale: "CDO not yet hired."
+      },
+      process: {
+        level: "A2",
+        points: 30,
+        rationale: "Workstreams progressing with minor delays."
+      },
+      technology: {
+        level: "A2",
+        points: 30,
+        rationale: "Technology implementation is moving forward."
+      },
+      conviction: {
+        score: 7,
+        signal: "healthy"
+      },
       overall: 25,
       label: "Early Stage",
       escalationRequired: false,
@@ -208,21 +256,22 @@ export async function scoreCheckInAnswers(clientId, questionsAndAnswers) {
 // ── Stage 3: Generate the health report ──────────────────────
 
 export async function generateHealthReport(
-  clientId,
   scores,
   questionsAndAnswers,
-  previousScore
+  previousScore = 25
 ) {
-  const knowledge = loadKnowledgeBase(clientId);
-  const systemPrompt = buildSystemPrompt(clientId, knowledge);
+  const trend = scores.overall > previousScore
+    ? "Improving"
+    : scores.overall < previousScore
+      ? "Declining"
+      : "Stable";
 
-  const trend = scores.overall > previousScore ? "↑ Improving"
-    : scores.overall < previousScore ? "↓ Declining"
-    : "→ Stable";
+  const knowledge = loadKnowledgeBase();
+  const systemPrompt = buildSystemPrompt(knowledge);
 
-  const qaText = questionsAndAnswers.map(qa =>
-    `${qa.dimension}: ${qa.answer}`
-  ).join("\n");
+  const qaText = questionsAndAnswers.map((qa, i) =>
+    `Q${i + 1}: ${qa.question}\nA: ${qa.answer}`
+  ).join("\n\n");
 
   const response = await client.messages.create({
     model: "claude-sonnet-4-20250514",
@@ -230,32 +279,54 @@ export async function generateHealthReport(
     system: systemPrompt,
     messages: [{
       role: "user",
-      content: `Generate the monthly Transformation Health Report.
+      content: `Generate a complete Transformation Health Report in markdown.
 
-      THIS MONTH'S SCORES:
-      Strategy: ${scores.strategy.level} (${scores.strategy.points}/100)
-      People: ${scores.people.level} (${scores.people.points}/100)
-      Process: ${scores.process.level} (${scores.process.points}/100)
-      Technology: ${scores.technology.level} (${scores.technology.points}/100)
-      Overall: ${scores.overall}/100 — ${scores.label}
-      Trend: ${trend} (previous: ${previousScore}/100)
-      Conviction: ${scores.conviction.score}/10 — ${scores.conviction.signal}
+      SCORES:
+      ${JSON.stringify(scores, null, 2)}
 
-      CLIENT'S ANSWERS SUMMARY:
+      PREVIOUS SCORE: ${previousScore}
+      TREND: ${trend}
+
+      CLIENT RESPONSES:
       ${qaText}
 
-      Generate the complete health report following the structure 
-      in the Health Check Scoring Rubric. Be direct about risks.
-      If conviction is below 6 or declining, flag it prominently.
-      
-      Format as clean markdown with clear sections.
-      End with Aria's 3 priorities for next month — specific and 
-      actionable, not generic.
-      
-      ${scores.escalationRequired ? 
-        "IMPORTANT: Include an escalation flag section — " + 
-        scores.escalationReason : ""
-      }`
+      The report must include:
+      - Overall score and label
+      - A dimension score table with trend arrows
+      - Milestone Status section
+      - Conviction reading
+      - Aria's top 3 priorities for next month
+      - An Escalation Flag section only if escalationRequired is true
+
+      Structure:
+
+      # Transformation Health Report
+      ## [Client Company Name] — [Month Year]
+
+      ---
+
+      ## Overall Health Score
+      [Overall score, label, and whether the trend is Improving, Declining, or Stable]
+
+      ## Dimension Scorecard
+      [Table covering Strategy, People, Process, and Technology with score and trend arrows]
+
+      ## Milestone Status
+      [Specific summary of active milestones and current status]
+
+      ## Conviction Reading
+      [Interpret the 1-10 conviction score and what it signals]
+
+      ## Aria's Top 3 Priorities for Next Month
+      1. [Priority one]
+      2. [Priority two]
+      3. [Priority three]
+
+      ## Escalation Flag
+      [Only include this section if escalationRequired is true]
+
+      ---
+      *Prepared with intelligence support from CGS Momentum / Aria*`
     }]
   });
 
