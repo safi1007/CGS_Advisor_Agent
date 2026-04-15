@@ -364,3 +364,22 @@ addMessage(
 );
 autoResizeInput();
 setBusyState(false);
+
+// --- Session opener briefing card (Dashboard only) ---
+async function loadSessionOpener() {
+  const textEl = document.getElementById("aria-briefing-text");
+  if (!textEl) return;
+
+  try {
+    const response = await fetch("/api/index?route=session-opener");
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Request failed");
+    const opener = data.opener || data.text || data.message || "";
+    textEl.textContent = opener;
+  } catch (_err) {
+    textEl.textContent =
+      "Welcome back James. Ready to continue your transformation journey.";
+  }
+}
+
+loadSessionOpener();
