@@ -1,5 +1,5 @@
 import express from "express";
-import chatHandler from "./api/chat.js";
+import apiHandler from "./api/index.js";
 import { config } from "dotenv";
 
 config();
@@ -93,9 +93,9 @@ app.post("/disruption-alert", async (_req, res) => {
 // Serve the UI files
 app.use(express.static("public"));
 
-// The chat endpoint — UI calls this, it calls Claude
-app.post("/api/chat", async (req, res) => {
-  return chatHandler(req, res);
+// Unified API endpoint for local development
+app.all("/api/index", async (req, res) => {
+  return apiHandler(req, res);
 });
 
 process.on("unhandledRejection", (error) => {

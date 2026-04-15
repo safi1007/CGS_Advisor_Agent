@@ -7,6 +7,7 @@ import {
   generateSessionOpener,
   loadPostEngagementKnowledge,
   runProjectMemory,
+  runProjectMemoryQA,
 } from "./project_memory.js";
 import {
   generateProgressQuestions,
@@ -44,6 +45,7 @@ export {
   generateSessionOpener,
   loadPostEngagementKnowledge,
   runProjectMemory,
+  runProjectMemoryQA,
   generateProgressQuestions,
   generateProgressReport,
   detectMeetingTrigger,

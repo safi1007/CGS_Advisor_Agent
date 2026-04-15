@@ -5,6 +5,8 @@ const statusEl = document.getElementById("status");
 const sendButtonEl = document.getElementById("send-button");
 
 const conversationHistory = [];
+let conversationState = null;
+let stateContext = null;
 
 function addMessage(role, content) {
   const messageEl = document.createElement("article");
@@ -28,12 +30,17 @@ async function sendMessage(content) {
   setBusyState(true);
 
   try {
-    const response = await fetch("/api/chat", {
+    const response = await fetch("/api/index", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ messages: conversationHistory }),
+      body: JSON.stringify({
+        route: "chat",
+        messages: conversationHistory,
+        conversationState,
+        stateContext,
+      }),
     });
 
     const data = await response.json();
@@ -42,6 +49,8 @@ async function sendMessage(content) {
       throw new Error(data.error || "Request failed");
     }
 
+    conversationState = data.conversationState ?? null;
+    stateContext = data.stateContext ?? null;
     conversationHistory.push({ role: "assistant", content: data.reply });
     addMessage("agent", data.reply);
   } catch (error) {
