@@ -1,3 +1,24 @@
+// ── Health score constants ─────────────────────────────────────────────────
+const CURRENT_HEALTH_SCORE = 29;
+const PREVIOUS_HEALTH_SCORE = 27;
+const HEALTH_SCORE_LABEL = 'Developing';
+const HEALTH_SCORE_TREND = '+2 from last month';
+
+// ── Populate health score text elements (ring fill handled by CSS animation) ─
+(function initHealthDisplay() {
+  var scoreEl = document.getElementById('dash-health-score');
+  if (scoreEl) scoreEl.textContent = CURRENT_HEALTH_SCORE;
+
+  var healthPageScoreEl = document.getElementById('health-page-score');
+  if (healthPageScoreEl) healthPageScoreEl.textContent = CURRENT_HEALTH_SCORE;
+
+  var labelEl = document.getElementById('dash-health-label');
+  if (labelEl) labelEl.textContent = HEALTH_SCORE_LABEL;
+
+  var trendEl = document.getElementById('dash-health-trend');
+  if (trendEl) trendEl.textContent = '\u2191 ' + HEALTH_SCORE_TREND;
+})();
+
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
 const inputEl = document.getElementById("message-input");
