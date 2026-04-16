@@ -96,9 +96,9 @@ function applyHealthScoreContent() {
     });
 
   const textBySelector = new Map([
-    ["[data-health-score-pill-baseline]", `Jan: ${BASELINE_HEALTH_SCORE}`],
-    ["[data-health-score-pill-previous]", `Feb: ${PREVIOUS_HEALTH_SCORE}`],
-    ["[data-health-score-pill-current]", `Mar: ${CURRENT_HEALTH_SCORE}`],
+    ["[data-health-score-pill-baseline]", `Oct '24: ${BASELINE_HEALTH_SCORE}`],
+    ["[data-health-score-pill-previous]", `Mar '26: ${PREVIOUS_HEALTH_SCORE}`],
+    ["[data-health-score-pill-current]", `Apr '26: ${CURRENT_HEALTH_SCORE}`],
     [
       "[data-health-score-report-current]",
       `↑ ${PREVIOUS_HEALTH_SCORE} → ${CURRENT_HEALTH_SCORE}`,
