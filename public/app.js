@@ -15,8 +15,8 @@ let activeRequestController = null;
 let isRequestInFlight = false;
 
 const sendArrowIcon = `
-  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-    <path d="M4.5 10h8.2l-3.4-3.4 1.4-1.4 5.8 5.8-5.8 5.8-1.4-1.4 3.4-3.4H4.5z"></path>
+  <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+    <path d="M4 12l8-8 8 8M12 4v16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </svg>
 `;
 
@@ -166,7 +166,14 @@ function addMessage(role, content) {
 
   const avatarEl = document.createElement("div");
   avatarEl.className = `message-avatar ${isUser ? "user" : "agent"}`;
-  avatarEl.textContent = isUser ? "JW" : "A";
+  if (isUser) {
+    avatarEl.textContent = "JW";
+  } else {
+    var orbImg = document.createElement("img");
+    orbImg.src = "aria-orb.svg";
+    orbImg.alt = "Aria";
+    avatarEl.appendChild(orbImg);
+  }
 
   const bodyEl = document.createElement("div");
   bodyEl.className = "message-body";
@@ -203,7 +210,10 @@ function showThinkingIndicator() {
 
   const avatarEl = document.createElement("div");
   avatarEl.className = "message-avatar agent";
-  avatarEl.textContent = "A";
+  const thinkOrbImg = document.createElement("img");
+  thinkOrbImg.src = "aria-orb.svg";
+  thinkOrbImg.alt = "Aria";
+  avatarEl.appendChild(thinkOrbImg);
 
   const bodyEl = document.createElement("div");
   bodyEl.className = "message-body";
@@ -358,12 +368,109 @@ document.querySelectorAll(".nav-item").forEach((button) => {
   });
 });
 
-addMessage(
-  "agent",
-  "Welcome. Tell me a bit about your industry and role, and we’ll begin the readiness assessment."
-);
 autoResizeInput();
 setBusyState(false);
+
+// --- Suggestion chips ---
+const CHIP_TEXTS = [
+  "What are my biggest risks right now?",
+  "I have a board meeting coming up",
+  "Run my monthly health check-in",
+  "Linda is blocking the CVCP again",
+];
+
+let chipsRowEl = null;
+let userHasSentMessage = false;
+
+function showSuggestionChips(afterEl) {
+  if (chipsRowEl) return; // already shown
+  chipsRowEl = document.createElement("div");
+  chipsRowEl.className = "suggestion-chips";
+
+  CHIP_TEXTS.forEach(function (text) {
+    var chip = document.createElement("button");
+    chip.type = "button";
+    chip.className = "chip";
+    chip.textContent = text;
+    chip.addEventListener("click", function () {
+      inputEl.value = text;
+      autoResizeInput();
+      hideChips();
+      formEl.dispatchEvent(new Event("submit", { cancelable: true }));
+    });
+    chipsRowEl.appendChild(chip);
+  });
+
+  // Insert as sibling after the opening message row in messagesEl
+  if (afterEl && afterEl.parentNode === messagesEl) {
+    messagesEl.insertBefore(chipsRowEl, afterEl.nextSibling);
+  } else {
+    messagesEl.appendChild(chipsRowEl);
+  }
+}
+
+function hideChips() {
+  if (chipsRowEl) {
+    chipsRowEl.remove();
+    chipsRowEl = null;
+  }
+}
+
+// --- Chat opening message (fetched from session-opener) ---
+async function loadChatOpener() {
+  // Show a pulsing placeholder while loading
+  const placeholderRow = document.createElement("article");
+  placeholderRow.className = "message-row agent";
+
+  const avatarEl = document.createElement("div");
+  avatarEl.className = "message-avatar agent";
+  const orbImg = document.createElement("img");
+  orbImg.src = "aria-orb.svg";
+  orbImg.alt = "Aria";
+  avatarEl.appendChild(orbImg);
+
+  const bodyEl = document.createElement("div");
+  bodyEl.className = "message-body";
+  const placeholder = document.createElement("div");
+  placeholder.className = "opener-placeholder";
+  bodyEl.appendChild(placeholder);
+
+  placeholderRow.appendChild(avatarEl);
+  placeholderRow.appendChild(bodyEl);
+  messagesEl.appendChild(placeholderRow);
+  scrollMessagesToBottom();
+
+  let openerText = "";
+  try {
+    const response = await fetch("/api/index?route=session-opener");
+    const data = await response.json();
+    if (!response.ok) throw new Error(data.error || "Request failed");
+    openerText = data.opener || data.text || data.message || "";
+  } catch (_err) {
+    openerText = "Welcome back James. Ready to continue your transformation journey.";
+  }
+
+  // Replace placeholder row with real message
+  messagesEl.removeChild(placeholderRow);
+  addMessage("agent", openerText);
+
+  // Show chips after the opening message row (sibling in messagesEl)
+  var allRows = messagesEl.querySelectorAll(".message-row.agent");
+  var lastRow = allRows[allRows.length - 1] || null;
+  showSuggestionChips(lastRow);
+}
+
+// Hide chips when user sends their first message
+var _origSendMessage = sendMessage;
+sendMessage = async function (content) {
+  if (!userHasSentMessage) {
+    userHasSentMessage = true;
+    hideChips();
+  }
+  return _origSendMessage(content);
+};
+
+loadChatOpener();
 
 // --- Session opener briefing card (Dashboard only) ---
 async function loadSessionOpener() {
