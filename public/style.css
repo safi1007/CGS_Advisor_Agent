@@ -318,6 +318,138 @@
   padding-left: 1.3rem;
 }
 
+.health-score-legend {
+  margin-top: 18px;
+  font-family: "DM Sans", sans-serif;
+}
+
+.health-score-legend-row {
+  display: flex;
+  align-items: stretch;
+  justify-content: space-between;
+  gap: 0;
+}
+
+.health-score-segment {
+  position: relative;
+  flex: 1 1 0;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 10px 14px;
+  border-radius: 999px;
+  min-width: 0;
+}
+
+.health-score-segment-active {
+  background: rgba(15, 30, 60, 0.05);
+  border: 1px solid rgba(15, 30, 60, 0.12);
+}
+
+.health-score-segment-copy {
+  min-width: 0;
+}
+
+.health-score-dot {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+.health-score-dot-early {
+  background: #dbeafe;
+}
+
+.health-score-dot-developing {
+  background: #93c5fd;
+}
+
+.health-score-dot-progressing {
+  background: #60a5fa;
+}
+
+.health-score-dot-advancing {
+  background: #3b82f6;
+}
+
+.health-score-dot-leading {
+  background: #2563eb;
+}
+
+.health-score-dot-pioneering {
+  background: #0f1e3c;
+}
+
+.health-score-range {
+  font-size: 11px;
+  line-height: 1.1;
+  font-weight: 600;
+  color: #0f1e3c;
+}
+
+.health-score-label-line {
+  margin-top: 4px;
+  font-size: 10px;
+  line-height: 1.1;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: #6b7a8d;
+  white-space: nowrap;
+}
+
+.health-score-segment-active .health-score-label-line {
+  color: #0f1e3c;
+  font-weight: 600;
+}
+
+.health-score-dot-progressing + .health-score-segment-copy .health-score-label-line,
+.health-score-dot-advancing + .health-score-segment-copy .health-score-label-line {
+  color: #0f1e3c;
+}
+
+.health-score-label-strong {
+  color: #0f1e3c;
+  font-weight: 500;
+}
+
+.health-score-label-stronger {
+  color: #0f1e3c;
+  font-weight: 600;
+}
+
+.health-score-divider {
+  width: 1px;
+  align-self: center;
+  background: rgba(15, 30, 60, 0.06);
+  margin: 8px 2px;
+}
+
+.health-score-legend-note {
+  margin-top: 12px;
+  font-size: 11px;
+  line-height: 1.4;
+  color: #6b7a8d;
+  text-align: center;
+  font-style: italic;
+}
+
+@keyframes donutDraw {
+  from {
+    stroke-dashoffset: var(--donut-circumference, 301.593);
+  }
+  to {
+    stroke-dashoffset: var(--donut-offset, 301.593);
+  }
+}
+
+.donut-arc {
+  transform: rotate(-90deg);
+  transform-origin: 50% 50%;
+  stroke-dasharray: var(--donut-circumference, 301.593);
+  stroke-dashoffset: var(--donut-offset, 301.593);
+}
+
 .message.agent li + li {
   margin-top: 6px;
 }
@@ -371,23 +503,20 @@
 }
 
 .message-avatar.agent {
-  background: radial-gradient(circle at 35% 35%, #ffbe72 0%, #e87a30 58%, #c85f16 100%);
-  color: #fff;
-  box-shadow: 0 0 0 6px rgba(232, 122, 48, 0.10);
+  background: transparent;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   animation: ariaPulse 2.8s ease-in-out infinite;
-  font-family: Georgia, "Times New Roman", serif;
-  font-style: italic;
 }
 
 @keyframes ariaPulse {
   0%, 100% {
     transform: scale(1);
-    box-shadow: 0 0 0 6px rgba(232, 122, 48, 0.10);
   }
 
   50% {
     transform: scale(1.06);
-    box-shadow: 0 0 0 10px rgba(232, 122, 48, 0.06);
   }
 }
 

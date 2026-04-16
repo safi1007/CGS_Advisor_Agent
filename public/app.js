@@ -1,3 +1,14 @@
+const CURRENT_HEALTH_SCORE = 29;
+const PREVIOUS_HEALTH_SCORE = 27;
+const HEALTH_SCORE_LABEL = "Developing";
+const HEALTH_SCORE_TREND = "+2 from last month";
+const BASELINE_HEALTH_SCORE = PREVIOUS_HEALTH_SCORE - 2;
+const HEALTH_SCORE_RING_RADIUS = 48;
+const HEALTH_SCORE_RING_CIRCUMFERENCE = 2 * Math.PI * HEALTH_SCORE_RING_RADIUS;
+const CHAT_MESSAGE_AVATAR_SIZE = 34;
+const SESSION_OPENER_TEXT =
+  "CDO Hired & Onboarded is still the milestone that will determine whether the rest of Meridian's roadmap moves on time. What feels most at risk right now?";
+
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
 const inputEl = document.getElementById("message-input");
@@ -14,6 +25,19 @@ let thinkingMessageEl = null;
 let activeRequestController = null;
 let isRequestInFlight = false;
 
+// Aria avatar SVG — single source of truth for the avatar appearance.
+// Change width/height only; never touch the defs, gradients, or path data.
+function ariaAvatarSVG(size) {
+  return `<svg class="aria-avatar" width="${size}" height="${size}" viewBox="0 15 280 280" xmlns="http://www.w3.org/2000/svg" shape-rendering="geometricPrecision" vector-effect="non-scaling-stroke" style="filter:none;box-shadow:none;-webkit-filter:none;transform:translateZ(0);backface-visibility:hidden;"><defs><clipPath id="sphereClip"><circle cx="140" cy="155" r="108"/></clipPath><radialGradient id="gBase" cx="52%" cy="38%" r="72%" fx="52%" fy="32%"><stop offset="0%" stop-color="#ffb87a"/><stop offset="18%" stop-color="#f07640"/><stop offset="45%" stop-color="#e85018"/><stop offset="78%" stop-color="#d04010"/><stop offset="100%" stop-color="#b83208"/></radialGradient><radialGradient id="gBlue" cx="28%" cy="72%" r="58%" fx="25%" fy="70%"><stop offset="0%" stop-color="#b0bee8" stop-opacity="0.95"/><stop offset="35%" stop-color="#9aaada" stop-opacity="0.80"/><stop offset="65%" stop-color="#8898cc" stop-opacity="0.45"/><stop offset="100%" stop-color="#7888be" stop-opacity="0"/></radialGradient><radialGradient id="gViolet" cx="50%" cy="82%" r="42%"><stop offset="0%" stop-color="#c0b0e0" stop-opacity="0.60"/><stop offset="60%" stop-color="#a898d0" stop-opacity="0.25"/><stop offset="100%" stop-color="#9888c0" stop-opacity="0"/></radialGradient><radialGradient id="gPeach" cx="78%" cy="80%" r="38%"><stop offset="0%" stop-color="#f4c098" stop-opacity="0.65"/><stop offset="100%" stop-color="#eca878" stop-opacity="0"/></radialGradient><radialGradient id="gHighlight" cx="50%" cy="2%" r="58%"><stop offset="0%" stop-color="#fff5ee" stop-opacity="0.72"/><stop offset="55%" stop-color="#fff5ee" stop-opacity="0.18"/><stop offset="100%" stop-color="#fff5ee" stop-opacity="0"/></radialGradient><radialGradient id="gRim" cx="50%" cy="50%" r="50%"><stop offset="72%" stop-color="#000000" stop-opacity="0"/><stop offset="92%" stop-color="#000000" stop-opacity="0.14"/><stop offset="100%" stop-color="#000000" stop-opacity="0.32"/></radialGradient><radialGradient id="gHalo" cx="50%" cy="50%" r="50%"><stop offset="84%" stop-color="#e8d8cc" stop-opacity="0"/><stop offset="94%" stop-color="#e8d8cc" stop-opacity="0.35"/><stop offset="100%" stop-color="#d8c8bc" stop-opacity="0.55"/></radialGradient><filter id="fStarGlow" x="-20%" y="-20%" width="140%" height="140%"><feGaussianBlur in="SourceGraphic" stdDeviation="2.2" result="blur"/><feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge></filter></defs><g><circle cx="140" cy="155" r="108" fill="url(#gBase)"/><circle cx="140" cy="155" r="108" fill="url(#gBlue)" clip-path="url(#sphereClip)"/><circle cx="140" cy="155" r="108" fill="url(#gViolet)" clip-path="url(#sphereClip)"/><circle cx="140" cy="155" r="108" fill="url(#gPeach)" clip-path="url(#sphereClip)"/><circle cx="140" cy="155" r="108" fill="url(#gHighlight)" clip-path="url(#sphereClip)"/><circle cx="140" cy="155" r="108" fill="url(#gRim)" clip-path="url(#sphereClip)"/><circle cx="140" cy="155" r="108" fill="url(#gHalo)" clip-path="url(#sphereClip)"/></g><path d="M 140,83 L 157,131 L 212,155 L 157,179 L 140,227 L 123,179 L 68,155 L 123,131 Z" fill="none" stroke="rgba(255,245,240,0.80)" stroke-width="3" stroke-linejoin="miter" stroke-miterlimit="10" filter="url(#fStarGlow)"/></svg>`;
+}
+
+function renderStaticAriaAvatars() {
+  document.querySelectorAll("[data-aria-avatar-size]").forEach((el) => {
+    const size = Number(el.getAttribute("data-aria-avatar-size"));
+    el.innerHTML = ariaAvatarSVG(size);
+  });
+}
+
 const sendArrowIcon = `
   <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
     <path d="M4 12l8-8 8 8M12 4v16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
@@ -25,6 +49,76 @@ const stopIcon = `
     <rect x="5.5" y="5.5" width="9" height="9" rx="1.5"></rect>
   </svg>
 `;
+
+function applyHealthScoreContent() {
+  const ringOffset =
+    HEALTH_SCORE_RING_CIRCUMFERENCE * (1 - CURRENT_HEALTH_SCORE / 100);
+  const scoreSinceEngagement = CURRENT_HEALTH_SCORE - BASELINE_HEALTH_SCORE;
+
+  document.querySelectorAll("[data-health-score-ring]").forEach((ringEl) => {
+    ringEl.style.setProperty(
+      "--donut-circumference",
+      `${HEALTH_SCORE_RING_CIRCUMFERENCE}`
+    );
+    ringEl.style.setProperty("--donut-offset", `${ringOffset}`);
+    ringEl.style.strokeDasharray = `${HEALTH_SCORE_RING_CIRCUMFERENCE}`;
+    ringEl.style.strokeDashoffset = `${ringOffset}`;
+  });
+
+  // Update the arc fade gradient endpoint so the gradient always runs from
+  // the arc start (transparent) to the arc midpoint (full opacity).
+  // SVG extends the last stop beyond 100%, keeping the tip fully opaque.
+  const arcAngle = (CURRENT_HEALTH_SCORE / 100) * 2 * Math.PI;
+  const midAngle = arcAngle / 2;
+  const gradX2 = (60 + HEALTH_SCORE_RING_RADIUS * Math.cos(midAngle)).toFixed(2);
+  const gradY2 = (60 + HEALTH_SCORE_RING_RADIUS * Math.sin(midAngle)).toFixed(2);
+  document.querySelectorAll("[data-arc-fade-grad]").forEach((grad) => {
+    grad.setAttribute("x2", gradX2);
+    grad.setAttribute("y2", gradY2);
+  });
+
+  document.querySelectorAll("[data-health-score-current]").forEach((el) => {
+    el.textContent = String(CURRENT_HEALTH_SCORE);
+  });
+
+  document.querySelectorAll("[data-health-score-label]").forEach((el) => {
+    el.textContent = HEALTH_SCORE_LABEL;
+  });
+
+  document.querySelectorAll("[data-health-score-trend]").forEach((el) => {
+    el.textContent = HEALTH_SCORE_TREND;
+  });
+
+  document
+    .querySelectorAll("[data-health-score-since-engagement]")
+    .forEach((el) => {
+      el.textContent = `${scoreSinceEngagement >= 0 ? "+" : ""}${scoreSinceEngagement}`;
+    });
+
+  const textBySelector = new Map([
+    ["[data-health-score-pill-baseline]", `Jan: ${BASELINE_HEALTH_SCORE}`],
+    ["[data-health-score-pill-previous]", `Feb: ${PREVIOUS_HEALTH_SCORE}`],
+    ["[data-health-score-pill-current]", `Mar: ${CURRENT_HEALTH_SCORE}`],
+    [
+      "[data-health-score-report-current]",
+      `↑ ${PREVIOUS_HEALTH_SCORE} → ${CURRENT_HEALTH_SCORE}`,
+    ],
+    [
+      "[data-health-score-report-previous]",
+      `↑ ${BASELINE_HEALTH_SCORE} → ${PREVIOUS_HEALTH_SCORE}`,
+    ],
+    ["[data-health-score-report-baseline]", `→ ${BASELINE_HEALTH_SCORE}/100`],
+    ["[data-health-score-history-current]", `${CURRENT_HEALTH_SCORE}/100`],
+    ["[data-health-score-history-previous]", `${PREVIOUS_HEALTH_SCORE}/100`],
+    ["[data-health-score-history-baseline]", `${BASELINE_HEALTH_SCORE}/100`],
+  ]);
+
+  textBySelector.forEach((text, selector) => {
+    document.querySelectorAll(selector).forEach((el) => {
+      el.textContent = text;
+    });
+  });
+}
 
 function scrollMessagesToBottom() {
   messagesEl.scrollTo({
@@ -169,10 +263,7 @@ function addMessage(role, content) {
   if (isUser) {
     avatarEl.textContent = "JW";
   } else {
-    var orbImg = document.createElement("img");
-    orbImg.src = "aria-orb.svg";
-    orbImg.alt = "Aria";
-    avatarEl.appendChild(orbImg);
+  avatarEl.innerHTML = ariaAvatarSVG(CHAT_MESSAGE_AVATAR_SIZE);
   }
 
   const bodyEl = document.createElement("div");
@@ -210,10 +301,7 @@ function showThinkingIndicator() {
 
   const avatarEl = document.createElement("div");
   avatarEl.className = "message-avatar agent";
-  const thinkOrbImg = document.createElement("img");
-  thinkOrbImg.src = "aria-orb.svg";
-  thinkOrbImg.alt = "Aria";
-  avatarEl.appendChild(thinkOrbImg);
+  avatarEl.innerHTML = ariaAvatarSVG(CHAT_MESSAGE_AVATAR_SIZE);
 
   const bodyEl = document.createElement("div");
   bodyEl.className = "message-body";
@@ -370,6 +458,8 @@ document.querySelectorAll(".nav-item").forEach((button) => {
 
 autoResizeInput();
 setBusyState(false);
+applyHealthScoreContent();
+renderStaticAriaAvatars();
 
 // --- Suggestion chips ---
 const CHIP_TEXTS = [
@@ -416,18 +506,15 @@ function hideChips() {
   }
 }
 
-// --- Chat opening message (fetched from session-opener) ---
-async function loadChatOpener() {
+// --- Chat opening message ---
+function loadChatOpener() {
   // Show a pulsing placeholder while loading
   const placeholderRow = document.createElement("article");
   placeholderRow.className = "message-row agent";
 
   const avatarEl = document.createElement("div");
   avatarEl.className = "message-avatar agent";
-  const orbImg = document.createElement("img");
-  orbImg.src = "aria-orb.svg";
-  orbImg.alt = "Aria";
-  avatarEl.appendChild(orbImg);
+  avatarEl.innerHTML = ariaAvatarSVG(CHAT_MESSAGE_AVATAR_SIZE);
 
   const bodyEl = document.createElement("div");
   bodyEl.className = "message-body";
@@ -440,19 +527,9 @@ async function loadChatOpener() {
   messagesEl.appendChild(placeholderRow);
   scrollMessagesToBottom();
 
-  let openerText = "";
-  try {
-    const response = await fetch("/api/index?route=session-opener");
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Request failed");
-    openerText = data.opener || data.text || data.message || "";
-  } catch (_err) {
-    openerText = "Welcome back James. Ready to continue your transformation journey.";
-  }
-
   // Replace placeholder row with real message
   messagesEl.removeChild(placeholderRow);
-  addMessage("agent", openerText);
+  addMessage("agent", SESSION_OPENER_TEXT);
 
   // Show chips after the opening message row (sibling in messagesEl)
   var allRows = messagesEl.querySelectorAll(".message-row.agent");
@@ -472,21 +549,20 @@ sendMessage = async function (content) {
 
 loadChatOpener();
 
-// --- Session opener briefing card (Dashboard only) ---
-async function loadSessionOpener() {
+// --- Dashboard hero greeting + session opener ---
+function loadSessionOpener() {
+  // Time-based greeting
+  const greetingEl = document.getElementById("dash-greeting");
+  if (greetingEl) {
+    const hour = new Date().getHours();
+    const salutation =
+      hour < 12 ? "Good morning" : hour < 17 ? "Good afternoon" : "Good evening";
+    greetingEl.textContent = `${salutation}, James.`;
+  }
+
   const textEl = document.getElementById("aria-briefing-text");
   if (!textEl) return;
-
-  try {
-    const response = await fetch("/api/index?route=session-opener");
-    const data = await response.json();
-    if (!response.ok) throw new Error(data.error || "Request failed");
-    const opener = data.opener || data.text || data.message || "";
-    textEl.textContent = opener;
-  } catch (_err) {
-    textEl.textContent =
-      "Welcome back James. Ready to continue your transformation journey.";
-  }
+  textEl.textContent = SESSION_OPENER_TEXT;
 }
 
 loadSessionOpener();
