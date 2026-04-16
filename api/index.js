@@ -366,14 +366,6 @@ export default async function handler(request, response) {
       return sendJson(response, 200, { alert: result });
     }
 
-    if (route === "session-opener") {
-      const methodError = ensureMethod(request, response, "GET");
-      if (methodError) return methodError;
-
-      const result = await postEngagement.generateSessionOpener();
-      return sendJson(response, 200, { opener: result });
-    }
-
     return sendJson(response, 404, {
       error: "Route not found",
     });

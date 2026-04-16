@@ -32,10 +32,6 @@
       .logo-title { color: #fff !important; font-size: 14px !important; font-weight: 600 !important; display: block !important; margin: 0 !important; white-space: nowrap !important; }
       .logo-sub { color: rgba(255,255,255,0.4) !important; font-size: 9px !important; letter-spacing: 1.5px !important; margin-top: 2px !important; display: block !important; white-space: nowrap !important; }
 
-      /* Top user avatar */
-      .sidebar-user { display: flex !important; align-items: center !important; justify-content: center !important; padding: 10px 0 !important; border-bottom: 0.5px solid rgba(255,255,255,0.08) !important; flex-shrink: 0 !important; }
-      .sidebar-avatar { width: 34px !important; height: 34px !important; border-radius: 50% !important; background: #c8a96e !important; display: flex !important; align-items: center !important; justify-content: center !important; flex-shrink: 0 !important; color: #0f1e36 !important; font-size: 12px !important; font-weight: 700 !important; }
-
       /* Nav */
       .sidebar-nav { padding: 10px 8px !important; flex: 1 !important; overflow: hidden !important; }
       .nav-item { display: flex !important; align-items: center !important; justify-content: center !important; width: 100% !important; height: 40px !important; border-radius: 8px !important; color: #c8a96e !important; margin-bottom: 4px !important; cursor: pointer !important; background: none !important; border: none !important; position: relative !important; box-sizing: border-box !important; overflow: hidden !important; transition: background 0.15s ease, color 0.15s ease !important; }
@@ -70,49 +66,63 @@
       .page-header p { font-size: 12px; color: #6b7a8d; margin: 4px 0 0; }
       .page-body { padding: 24px 28px; }
 
-      .dash-grid-top { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; margin-bottom: 16px; }
-      .dash-grid-bottom { display: grid; grid-template-columns: 1.4fr 1fr; gap: 16px; }
-      .card { background: #fff; border-radius: 12px; padding: 20px; border: 0.5px solid #e2e6ea; }
+      .dash-grid-top { display: grid; grid-template-columns: 1.1fr 1fr; gap: 16px; margin-bottom: 16px; }
+      .card-combined { display: flex; align-items: stretch; }
+      .card-combined-left { width: 40%; display: flex; flex-direction: column; align-items: center; padding-right: 20px; }
+      .card-combined-divider { width: 1px; flex-shrink: 0; background: rgba(15,30,60,0.08); margin: 0 20px; }
+      .card-combined-right { flex: 1; display: flex; flex-direction: column; justify-content: center; }
+      .dash-grid-bottom { display: grid; grid-template-columns: 1.4fr 1fr 1fr; gap: 16px; }
+      .card { background: rgba(255,255,255,0.55); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border: 1px solid rgba(255,255,255,0.7); box-shadow: 0 4px 24px rgba(15,30,60,0.08), 0 1px 0 rgba(255,255,255,0.8) inset; border-radius: 16px; padding: 20px; }
       .card-label { font-size: 10px; letter-spacing: 1.5px; color: #6b7a8d; font-weight: 600; margin-bottom: 14px; }
       .badge-sub { background: #e8f8ee; color: #2e7d52; font-size: 12px; padding: 5px 12px; border-radius: 20px; font-weight: 500; display: flex; align-items: center; gap: 6px; }
       .badge-sub::before { content: ''; width: 7px; height: 7px; border-radius: 50%; background: #2e7d52; display: inline-block; }
 
       .donut-wrap { display: flex; flex-direction: column; align-items: center; }
       .donut-svg { width: 120px; height: 120px; }
-      .donut-title { font-size: 15px; font-weight: 600; color: #1a2332; margin-top: 10px; }
-      .donut-sub { font-size: 12px; color: #7aac7a; margin-top: 2px; }
+      .donut-title { font-size: 11px; font-family: "DM Sans", sans-serif; font-weight: 600; color: #6b7a8d; margin-top: 8px; text-transform: uppercase; letter-spacing: 0.5px; }
+      .donut-trend { display: inline-block; background: #dcfce7; color: #166534; font-size: 11px; font-weight: 500; padding: 2px 8px; border-radius: 10px; margin-top: 6px; }
 
-      .dim-row { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
-      .dim-name { font-size: 13px; color: #1a2332; width: 80px; flex-shrink: 0; }
-      .dim-bar-wrap { flex: 1; background: #edf0f4; border-radius: 4px; height: 8px; }
-      .dim-bar { height: 8px; border-radius: 4px; background: #3b82f6; }
-      .dim-bar.red { background: #1d4ed8; }
-      .dim-badge { font-size: 11px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #dbeafe; color: #1d4ed8; }
-      .dim-badge.red { background: #bfdbfe; color: #1e40af; }
+      .dim-row { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+      .dim-row:last-child { margin-bottom: 0; }
+      .dim-name { font-size: 11px; color: #6b7a8d; width: 76px; flex-shrink: 0; text-transform: uppercase; letter-spacing: 1px; font-weight: 600; }
+      .dim-bar-wrap { flex: 1; background: #e8e2d8; border-radius: 3px; height: 6px; }
+      .dim-bar { height: 6px; border-radius: 3px; background: #3b82f6; }
+      .dim-bar.red { background: #3b82f6; }
+      .dim-badge { font-size: 11px; font-weight: 600; padding: 2px 8px; border-radius: 6px; background: #dbeafe; color: #2563eb; }
+      .dim-badge.red { background: #dbeafe; color: #2563eb; }
 
-      .qa-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border-radius: 10px; font-size: 14px; font-weight: 500; border: none; cursor: pointer; margin-bottom: 10px; }
-      .qa-btn.orange { background: #fff; color: #2563eb; border: 1px solid #2563eb; }
-      .qa-btn.orange:active { background: #e87a30; color: #fff; border-color: #e87a30; }
-      .qa-btn.dark { background: #fff; color: #2563eb; border: 1px solid #2563eb; }
-      .qa-btn.dark:active { background: #e87a30; color: #fff; border-color: #e87a30; }
-      .qa-btn.outline { background: #fff; color: #2563eb; border: 1px solid #2563eb; }
-      .qa-btn.outline:active { background: #e87a30; color: #fff; border-color: #e87a30; }
+      .qa-btn { display: flex; align-items: center; gap: 10px; width: 100%; padding: 12px 16px; border-radius: 10px; font-size: 13px; font-weight: 500; border: 1px solid #3b82f6; background: #fff; color: #2563eb; cursor: pointer; margin-bottom: 10px; font-family: inherit; transition: background 0.15s ease, color 0.15s ease, border-color 0.15s ease; box-sizing: border-box; }
+      .qa-btn:last-child { margin-bottom: 0; }
+      .qa-btn:hover { background: #3b82f6; color: #fff; }
+      .qa-btn.orange, .qa-btn.dark, .qa-btn.outline { background: #fff; color: #2563eb; border: 1px solid #3b82f6; }
+      .qa-btn.orange:hover, .qa-btn.dark:hover, .qa-btn.outline:hover { background: #3b82f6; color: #fff; }
+
+      .dashboard-health-card { padding: 16px; }
+      .dashboard-health-card .card-label { margin-bottom: 10px; }
+      .dashboard-health-card .card-combined-left { width: 34%; padding-right: 12px; }
+      .dashboard-health-card .card-combined-divider { margin: 0 12px; }
+      .dashboard-health-card .donut-svg { width: 112px; height: 112px; }
+      .dashboard-health-card .donut-title { margin-top: 6px; }
+      .dashboard-health-card .donut-trend { margin-top: 4px; }
+      .dashboard-health-card .dim-row { margin-bottom: 10px; }
 
       .roadmap-item { display: flex; align-items: center; gap: 12px; padding: 10px 0; border-bottom: 0.5px solid #f0f2f5; }
       .roadmap-item:last-child { border-bottom: none; }
-      .rm-dot { width: 10px; height: 10px; border-radius: 50%; flex-shrink: 0; }
+      .rm-dot { width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0; }
       .rm-dot.green { background: #2e7d52; }
       .rm-dot.orange { background: #3b82f6; }
       .rm-dot.gray { background: #c8cdd5; }
-      .rm-name { flex: 1; font-size: 13px; color: #1a2332; }
-      .rm-date { font-size: 12px; color: #6b7a8d; margin-right: 8px; }
-      .rm-badge { font-size: 11px; font-weight: 600; padding: 3px 10px; border-radius: 20px; }
-      .rm-badge.done { background: #e8f8ee; color: #2e7d52; }
+      .rm-name { flex: 1; font-size: 13px; color: #0f1e3c; font-weight: 500; }
+      .rm-date { font-size: 11px; color: #6b7a8d; }
+      .rm-badge { font-size: 10px; font-weight: 600; padding: 3px 10px; border-radius: 20px; text-transform: uppercase; letter-spacing: 0.5px; white-space: nowrap; }
+      .rm-badge.done { background: #dcfce7; color: #166534; }
       .rm-badge.progress { background: #dbeafe; color: #1d4ed8; }
-      .rm-badge.upcoming { background: #edf0f4; color: #6b7a8d; }
+      .rm-badge.upcoming { background: #f1f5f9; color: #6b7a8d; }
 
-      .activity-row { font-size: 13px; color: #4a5568; margin-bottom: 10px; line-height: 1.5; }
-      .activity-row strong { color: #1a2332; }
+      .activity-row { display: flex; align-items: center; justify-content: space-between; margin-bottom: 12px; }
+      .activity-row:last-child { margin-bottom: 0; }
+      .activity-label { font-size: 12px; color: #6b7a8d; }
+      .activity-value { font-size: 13px; color: #0f1e3c; font-weight: 600; }
 
       .health-grid { display: grid; grid-template-columns: 1fr 1.6fr; gap: 16px; margin-bottom: 16px; }
       .score-pills { display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap; }
@@ -247,15 +257,19 @@
       .toggle.off { background: #c8cdd5; justify-content: flex-start; }
       .toggle-thumb { width: 20px; height: 20px; border-radius: 50%; background: #fff; }
 
-      /* Aria Briefing Card */
-      .aria-briefing-card { background: linear-gradient(to right, #fff8f4, #fff); border-left: 3px solid #e8540b; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(15,30,60,0.06); }
-      .aria-briefing-inner { display: flex; align-items: flex-start; gap: 14px; }
-      .aria-avatar-small { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
-      .aria-avatar-small img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
-      .aria-briefing-label { font-size: 10px; letter-spacing: 2px; color: #e8540b; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; }
-      .aria-briefing-text { font-size: 15px; color: #0f1e3c; line-height: 1.7; }
+      /* Dashboard hero greeting */
+      .dash-hero { padding: 48px 28px 0; text-align: center; }
+      .dash-hero-heading-row { display: inline-flex; align-items: center; gap: 12px; margin-bottom: 16px; }
+      .dash-hero-greeting { font-size: 36px; font-weight: 400; color: #0f1e3c; margin: 0; line-height: 1.2; }
+      .dash-hero-opener { font-size: 15px; color: #6b7a8d; max-width: 720px; margin: 0 auto; line-height: 1.7; }
+      .dash-hero-divider { border: none; border-top: 1px solid rgba(15,30,60,0.08); margin: 32px 0; }
+      /* Aria avatar SVG */
+      .aria-avatar-wrap { display: inline-flex; align-items: center; justify-content: center; flex-shrink: 0; filter: none; box-shadow: none; -webkit-filter: none; transform: translateZ(0); backface-visibility: hidden; }
+      .dash-hero-avatar { width: 44px; height: 44px; }
+      .chat-header-avatar { width: 20px; height: 20px; }
+      .aria-avatar { display: block; width: 100%; height: 100%; flex-shrink: 0; filter: none; box-shadow: none; -webkit-filter: none; transform: translateZ(0); backface-visibility: hidden; }
       @keyframes shimmer { from { background-position: -600px 0; } to { background-position: 600px 0; } }
-      .skeleton-line { height: 13px; border-radius: 6px; background: linear-gradient(90deg, #ede9e4 25%, #f5f2ef 50%, #ede9e4 75%); background-size: 1200px 100%; animation: shimmer 1.5s infinite linear; margin-bottom: 10px; }
+      .skeleton-line { height: 13px; border-radius: 6px; background: linear-gradient(90deg, #ede9e4 25%, #f5f2ef 50%, #ede9e4 75%); background-size: 1200px 100%; animation: shimmer 1.5s infinite linear; margin: 0 auto 10px; }
       .skeleton-line:last-child { margin-bottom: 0; width: 55%; }
 
       .chat-page { display: flex; flex-direction: column; height: 100vh; }
@@ -276,20 +290,19 @@
       .message.agent { background: transparent; color: #233044; padding: 2px 0; }
       .message-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; margin-top: 2px; }
       .message-avatar.user { background: #c9a55c; color: #0f1e3c; }
-      .message-avatar.agent { background: transparent; overflow: hidden; animation: ariaPulse 2.8s ease-in-out infinite; }
-      .message-avatar.agent img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
+      .message-avatar.agent { width: 34px; height: 34px; background: transparent; display: flex; align-items: center; justify-content: center; filter: none; box-shadow: none; -webkit-filter: none; transform: translateZ(0); backface-visibility: hidden; animation: ariaPulse 2.8s ease-in-out infinite; }
       @keyframes ariaPulse {
-        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(232,122,48,0.18)); }
-        50% { transform: scale(1.07); filter: drop-shadow(0 0 8px rgba(232,122,48,0.28)); }
+        0%, 100% { transform: scale(1); }
+        50% { transform: scale(1.07); }
       }
 
       /* Orb expand animation — fires when a tab is visited for the first time */
       @keyframes orbFirstVisit {
-        0%   { transform: scale(0.5);  opacity: 0; filter: drop-shadow(0 0 0px rgba(232,122,48,0)); }
-        55%  { transform: scale(1.18); opacity: 1; filter: drop-shadow(0 0 14px rgba(232,122,48,0.42)); }
-        75%  { transform: scale(0.94); filter: drop-shadow(0 0 6px rgba(232,122,48,0.22)); }
+        0%   { transform: scale(0.5);  opacity: 0; }
+        55%  { transform: scale(1.18); opacity: 1; }
+        75%  { transform: scale(0.94); }
         90%  { transform: scale(1.04); }
-        100% { transform: scale(1);   filter: drop-shadow(0 0 5px rgba(232,122,48,0.16)); }
+        100% { transform: scale(1); }
       }
       .aria-orb-first-visit {
         animation: ariaPulse 2.8s ease-in-out infinite, orbFirstVisit 0.85s cubic-bezier(0.22,1,0.36,1) both !important;
@@ -336,21 +349,25 @@
       }
       .page.active { animation: pageIn 0.38s cubic-bezier(0.22,1,0.36,1) both; }
 
-      /* 2. Card hover lift with blue glow */
+      /* 2. Card hover lift */
       .card, .settings-card, .roadmap-card, .gap-card, .dim-card {
-        transition: box-shadow 0.22s ease, transform 0.22s ease;
+        transition: all 0.2s ease;
       }
       .card:hover, .settings-card:hover, .roadmap-card:hover, .gap-card:hover {
-        box-shadow: 0 10px 32px rgba(37,99,235,0.13);
-        transform: translateY(-3px);
+        transform: translateY(-2px);
+        box-shadow: 0 8px 32px rgba(15,30,60,0.12), 0 1px 0 rgba(255,255,255,0.8) inset;
       }
 
       /* 3. Donut arc draw animation */
       @keyframes donutDraw {
-        from { stroke-dashoffset: 302; }
-        to   { stroke-dashoffset: 75; }
+        from { stroke-dashoffset: var(--donut-circumference, 301.593); }
+        to   { stroke-dashoffset: var(--donut-offset, 301.593); }
       }
       .donut-arc {
+        transform: rotate(-90deg);
+        transform-origin: 50% 50%;
+        stroke-dasharray: var(--donut-circumference, 301.593);
+        stroke-dashoffset: var(--donut-offset, 301.593);
         animation: donutDraw 1.1s cubic-bezier(0.22,1,0.36,1) both;
         animation-delay: 0.15s;
       }
@@ -400,10 +417,31 @@
 
       /* Staggered dashboard card entrance */
       .dash-grid-top .card:nth-child(1) { animation-delay: 0s; }
-      .dash-grid-top .card:nth-child(2) { animation-delay: 0.07s; }
-      .dash-grid-top .card:nth-child(3) { animation-delay: 0.14s; }
+      .dash-grid-top .card:nth-child(2) { animation-delay: 0.10s; }
       .dash-grid-bottom .card:nth-child(1) { animation-delay: 0.18s; }
       .dash-grid-bottom .card:nth-child(2) { animation-delay: 0.24s; }
+      .dash-grid-bottom .card:nth-child(3) { animation-delay: 0.30s; }
+
+      /* ── Calendar card (vertical, in top-grid right column) ── */
+      .cal-card { display: flex; flex-direction: column; }
+      .cal-header { display: flex; align-items: center; gap: 9px; margin-bottom: 5px; }
+      .cal-icon { width: 30px; height: 30px; border-radius: 8px; background: #eff6ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #3b82f6; }
+      .cal-heading { font-size: 13px; font-weight: 600; color: #0f1e3c; line-height: 1.35; margin: 0; }
+      .cal-sub { font-size: 11px; color: #6b7a8d; line-height: 1.55; margin: 0 0 12px; }
+      .cal-event { display: flex; align-items: flex-start; gap: 10px; padding: 9px 0; border-bottom: 0.5px solid #f0f2f5; }
+      .cal-event:first-child { padding-top: 0; }
+      .cal-event:last-child { border-bottom: none; padding-bottom: 0; }
+      .cal-date-col { width: 36px; flex-shrink: 0; text-align: right; }
+      .cal-day-label { font-size: 9px; letter-spacing: 1px; color: #6b7a8d; font-weight: 600; text-transform: uppercase; display: block; }
+      .cal-date-num { font-size: 12px; font-weight: 700; color: #0f1e3c; display: block; margin-top: 2px; }
+      .cal-pipe { width: 2px; min-height: 30px; background: #3b82f6; border-radius: 1px; flex-shrink: 0; align-self: stretch; }
+      .cal-event-body { flex: 1; min-width: 0; }
+      .cal-event-title { font-size: 12px; font-weight: 600; color: #0f1e3c; margin: 0 0 2px; line-height: 1.3; }
+      .cal-event-meta { font-size: 11px; color: #6b7a8d; margin: 0; }
+      .cal-join-btn { display: inline-flex; align-items: center; gap: 5px; margin-top: 6px; background: #0f1e3c; color: #fff; font-size: 10px; font-weight: 500; padding: 3px 9px; border-radius: 5px; border: none; cursor: pointer; font-family: inherit; transition: background 0.15s ease; }
+      .cal-join-btn:hover { background: #1a2f52; }
+      .cal-link { font-size: 11px; color: #3b82f6; font-weight: 500; text-decoration: none; cursor: pointer; margin-top: 10px; display: block; }
+      .cal-link:hover { text-decoration: underline; }
 
       /* ── Reports card grid ── */
       .reports-section { margin-bottom: 32px; }
@@ -483,9 +521,6 @@
             <span class="logo-sub">POWERED BY ARIA</span>
           </div>
         </div>
-        <div class="sidebar-user">
-          <div class="sidebar-avatar">JW</div>
-        </div>
         <nav class="sidebar-nav">
           <button class="nav-item active" data-page="dashboard" data-label="Dashboard">
             <svg class="nav-icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/></svg>
@@ -533,39 +568,122 @@
             </div>
             <div class="badge-sub">Active Subscription</div>
           </div>
+          <section class="dash-hero">
+            <div class="dash-hero-heading-row">
+              <span class="aria-avatar-wrap dash-hero-avatar" data-aria-avatar-size="44"></span>
+              <h2 id="dash-greeting" class="dash-hero-greeting"></h2>
+            </div>
+            <div id="aria-briefing-text" class="dash-hero-opener">
+              <div class="skeleton-line" style="width:80%"></div>
+              <div class="skeleton-line" style="width:60%"></div>
+            </div>
+            <hr class="dash-hero-divider" />
+          </section>
           <div class="page-body">
-            <div id="aria-briefing-card" class="aria-briefing-card">
-              <div class="aria-briefing-inner">
-                <div class="aria-avatar-small"><img src="aria-orb.svg" alt="Aria"/></div>
-                <div style="flex:1;min-width:0;">
-                  <div class="aria-briefing-label">ARIA — Today's Briefing</div>
-                  <div id="aria-briefing-text" class="aria-briefing-text">
-                    <div class="skeleton-line" style="width:100%"></div>
-                    <div class="skeleton-line" style="width:88%"></div>
-                    <div class="skeleton-line"></div>
+            <div class="dash-grid-top">
+              <div class="card dashboard-health-card">
+                <div class="card-combined">
+                  <div class="card-combined-left">
+                    <div class="card-label">OVERALL HEALTH SCORE</div>
+                    <div class="donut-wrap">
+                      <svg class="donut-svg" viewBox="0 0 120 120">
+                        <defs>
+                          <!-- Gradient goes from arc start (3-o'clock in SVG space = 12-o'clock visual)
+                               transparent, to the arc midpoint at full opacity. SVG extends the
+                               last stop beyond 100%, so the tip is always fully opaque.
+                               x2/y2 are updated by applyHealthScoreContent() in app.js. -->
+                          <linearGradient id="arcGrad" x1="108" y1="60" x2="89.50" y2="97.92" gradientUnits="userSpaceOnUse" data-arc-fade-grad>
+                            <stop offset="0%" stop-color="#3b82f6" stop-opacity="0"/>
+                            <stop offset="100%" stop-color="#3b82f6" stop-opacity="1"/>
+                          </linearGradient>
+                        </defs>
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="#edf0f4" stroke-width="7"/>
+                        <circle cx="60" cy="60" r="48" fill="none" stroke="url(#arcGrad)" stroke-width="7" stroke-linecap="round" class="donut-arc" data-health-score-ring/>
+                        <text x="60" y="74" text-anchor="middle" font-size="42" font-weight="700" fill="#0f1e3c" style="font-family:'DM Sans',sans-serif" data-health-score-current>--</text>
+                        <text x="60" y="89" text-anchor="middle" font-size="13" font-weight="400" fill="#a0aab8" style="font-family:'DM Sans',sans-serif">/100</text>
+                      </svg>
+                      <div class="donut-title" data-health-score-label></div>
+                      <span class="donut-trend" data-health-score-trend></span>
+                    </div>
+                  </div>
+                  <div class="card-combined-divider"></div>
+                  <div class="card-combined-right">
+                    <div class="card-label">DIMENSION SCORES</div>
+                    <div class="dim-row"><span class="dim-name">Strategy</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:55%"></div></div><span class="dim-badge">A2</span></div>
+                    <div class="dim-row"><span class="dim-name">People</span><div class="dim-bar-wrap"><div class="dim-bar red" style="width:25%"></div></div><span class="dim-badge red">A1</span></div>
+                    <div class="dim-row"><span class="dim-name">Process</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:55%"></div></div><span class="dim-badge">A2</span></div>
+                    <div class="dim-row"><span class="dim-name">Technology</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:55%"></div></div><span class="dim-badge">A2</span></div>
                   </div>
                 </div>
               </div>
-            </div>
-            <div class="dash-grid-top">
-              <div class="card">
-                <div class="card-label">OVERALL HEALTH SCORE</div>
-                <div class="donut-wrap">
-                  <svg class="donut-svg" viewBox="0 0 120 120">
-                    <circle cx="60" cy="60" r="48" fill="none" stroke="#edf0f4" stroke-width="12"/>
-                    <circle cx="60" cy="60" r="48" fill="none" stroke="#3b82f6" stroke-width="12" stroke-dasharray="201 301" stroke-dashoffset="75" stroke-linecap="round" class="donut-arc"/>
-                    <text x="60" y="66" text-anchor="middle" font-size="22" font-weight="700" fill="#1a2332">67</text>
-                  </svg>
-                  <div class="donut-title">Developing</div>
-                  <div class="donut-sub">↑ +4 from last month</div>
+              <!-- UPCOMING MEETINGS (calendar integration) -->
+              <div class="card cal-card">
+                <div class="cal-header">
+                  <div class="cal-icon">
+                    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">
+                      <rect x="3" y="4" width="18" height="18" rx="2"/>
+                      <line x1="16" y1="2" x2="16" y2="6"/>
+                      <line x1="8" y1="2" x2="8" y2="6"/>
+                      <line x1="3" y1="10" x2="21" y2="10"/>
+                    </svg>
+                  </div>
+                  <p class="cal-heading">Upcoming meetings with your CGS team</p>
                 </div>
+                <p class="cal-sub">3 sessions scheduled this week across check-ins, board prep, and the CDO search.</p>
+                <div class="cal-event">
+                  <div class="cal-date-col">
+                    <span class="cal-day-label">TODAY</span>
+                    <span class="cal-date-num">Apr 16</span>
+                  </div>
+                  <div class="cal-pipe"></div>
+                  <div class="cal-event-body">
+                    <p class="cal-event-title">Monthly Check-in · Sarah Chen</p>
+                    <p class="cal-event-meta">10 AM · Virtual</p>
+                    <button class="cal-join-btn">
+                      <svg width="10" height="10" viewBox="0 0 20 20" fill="currentColor"><path d="M2 6a2 2 0 012-2h6a2 2 0 012 2v8a2 2 0 01-2 2H4a2 2 0 01-2-2V6zm12 2.268V13.732L18.553 16A.5.5 0 0019 15.535v-7.07a.5.5 0 00-.723-.447L14 10.268z"/></svg>
+                      Join Call
+                    </button>
+                  </div>
+                </div>
+                <div class="cal-event">
+                  <div class="cal-date-col">
+                    <span class="cal-day-label">FRI</span>
+                    <span class="cal-date-num">Apr 18</span>
+                  </div>
+                  <div class="cal-pipe"></div>
+                  <div class="cal-event-body">
+                    <p class="cal-event-title">Board Meeting Prep Session</p>
+                    <p class="cal-event-meta">2 PM · Virtual</p>
+                  </div>
+                </div>
+                <div class="cal-event">
+                  <div class="cal-date-col">
+                    <span class="cal-day-label">MON</span>
+                    <span class="cal-date-num">Apr 21</span>
+                  </div>
+                  <div class="cal-pipe"></div>
+                  <div class="cal-event-body">
+                    <p class="cal-event-title">CDO Interview – Round 2</p>
+                    <p class="cal-event-meta">9 AM · Office</p>
+                  </div>
+                </div>
+                <a class="cal-link">View all sessions →</a>
+              </div>
+            </div>
+            <div class="dash-grid-bottom">
+              <div class="card">
+                <div class="card-label">ROADMAP STATUS</div>
+                <div class="roadmap-item"><span class="rm-dot green"></span><span class="rm-name">Executive Alignment Workshop</span><span class="rm-date">Q1 2025</span><span class="rm-badge done">✓ Done</span></div>
+                <div class="roadmap-item"><span class="rm-dot orange"></span><span class="rm-name">CDO Hired &amp; Onboarded</span><span class="rm-date">Q1 2025</span><span class="rm-badge progress">In Progress</span></div>
+                <div class="roadmap-item"><span class="rm-dot gray"></span><span class="rm-name">Data Infrastructure Phase 1</span><span class="rm-date">Q2 2025</span><span class="rm-badge upcoming">Upcoming</span></div>
+                <div class="roadmap-item"><span class="rm-dot gray"></span><span class="rm-name">Connected Vehicle Pilot</span><span class="rm-date">Q3 2025</span><span class="rm-badge upcoming">Upcoming</span></div>
               </div>
               <div class="card">
-                <div class="card-label">DIMENSION SCORES</div>
-                <div class="dim-row"><span class="dim-name">Strategy</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:55%"></div></div><span class="dim-badge">A2</span></div>
-                <div class="dim-row"><span class="dim-name">People</span><div class="dim-bar-wrap"><div class="dim-bar red" style="width:25%"></div></div><span class="dim-badge red">A1</span></div>
-                <div class="dim-row"><span class="dim-name">Process</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:55%"></div></div><span class="dim-badge">A2</span></div>
-                <div class="dim-row"><span class="dim-name">Technology</span><div class="dim-bar-wrap"><div class="dim-bar" style="width:55%"></div></div><span class="dim-badge">A2</span></div>
+                <div class="card-label">LAST ACTIVITY</div>
+                <div class="activity-row"><span class="activity-label">Last check-in</span><span class="activity-value">23 days ago</span></div>
+                <div class="activity-row"><span class="activity-label">Last report</span><span class="activity-value">March Health Report</span></div>
+                <div class="activity-row"><span class="activity-label">Last session</span><span class="activity-value">2 days ago</span></div>
+                <div class="activity-row"><span class="activity-label">CGS Advisor</span><span class="activity-value">Sarah Chen</span></div>
               </div>
               <div class="card">
                 <div class="card-label">QUICK ACTIONS</div>
@@ -583,22 +701,6 @@
                 </button>
               </div>
             </div>
-            <div class="dash-grid-bottom">
-              <div class="card">
-                <div class="card-label">ROADMAP STATUS</div>
-                <div class="roadmap-item"><span class="rm-dot green"></span><span class="rm-name">Executive Alignment Workshop</span><span class="rm-date">Q1 2025</span><span class="rm-badge done">✓ Done</span></div>
-                <div class="roadmap-item"><span class="rm-dot orange"></span><span class="rm-name">CDO Hired &amp; Onboarded</span><span class="rm-date">Q1 2025</span><span class="rm-badge progress">In Progress</span></div>
-                <div class="roadmap-item"><span class="rm-dot gray"></span><span class="rm-name">Data Infrastructure Phase 1</span><span class="rm-date">Q2 2025</span><span class="rm-badge upcoming">Upcoming</span></div>
-                <div class="roadmap-item"><span class="rm-dot gray"></span><span class="rm-name">Connected Vehicle Pilot</span><span class="rm-date">Q3 2025</span><span class="rm-badge upcoming">Upcoming</span></div>
-              </div>
-              <div class="card">
-                <div class="card-label">LAST ACTIVITY</div>
-                <div class="activity-row">Last check-in: <strong>23 days ago</strong></div>
-                <div class="activity-row">Last report: <strong>March Health Report</strong></div>
-                <div class="activity-row">Last session: <strong>2 days ago</strong></div>
-                <div class="activity-row">Your CGS Advisor: <strong>Sarah Chen</strong></div>
-              </div>
-            </div>
           </div>
         </div>
 
@@ -607,7 +709,7 @@
           <div class="chat-page">
             <div class="chat-header">
               <div class="chat-header-inner">
-                <div class="chat-header-dot"></div>
+                <span class="aria-avatar-wrap chat-header-avatar" data-aria-avatar-size="20"></span>
                 <span class="chat-header-name">Aria</span>
                 <span class="chat-header-status">● Online</span>
               </div>
@@ -651,18 +753,73 @@
                 <div class="card-label">CURRENT SCORE</div>
                 <div class="donut-wrap">
                   <svg class="donut-svg" viewBox="0 0 120 120">
-                    <circle cx="60" cy="60" r="48" fill="none" stroke="#edf0f4" stroke-width="12"/>
-                    <circle cx="60" cy="60" r="48" fill="none" stroke="#3b82f6" stroke-width="12" stroke-dasharray="201 301" stroke-dashoffset="75" stroke-linecap="round" class="donut-arc"/>
-                    <text x="60" y="66" text-anchor="middle" font-size="22" font-weight="700" fill="#1a2332">67</text>
+                    <defs>
+                      <linearGradient id="arcGradHealth" x1="108" y1="60" x2="89.50" y2="97.92" gradientUnits="userSpaceOnUse" data-arc-fade-grad>
+                        <stop offset="0%" stop-color="#3b82f6" stop-opacity="0"/>
+                        <stop offset="100%" stop-color="#3b82f6" stop-opacity="1"/>
+                      </linearGradient>
+                    </defs>
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="#edf0f4" stroke-width="7"/>
+                    <circle cx="60" cy="60" r="48" fill="none" stroke="url(#arcGradHealth)" stroke-width="7" stroke-linecap="round" class="donut-arc" data-health-score-ring/>
+                    <text x="60" y="74" text-anchor="middle" font-size="42" font-weight="700" fill="#0f1e3c" style="font-family:'DM Sans',sans-serif" data-health-score-current>--</text>
+                    <text x="60" y="89" text-anchor="middle" font-size="13" font-weight="400" fill="#a0aab8" style="font-family:'DM Sans',sans-serif">/100</text>
                   </svg>
-                  <div class="donut-title">Developing</div>
-                  <div class="score-pills">
-                    <span class="pill jan">Jan: 58</span>
-                    <span class="pill feb">Feb: 63</span>
-                    <span class="pill mar">Mar: 67</span>
-                  </div>
+                  <div class="donut-title" data-health-score-label></div>
+                  <span class="donut-trend" data-health-score-trend></span>
                 </div>
                 <button class="btn-orange">Start New Check-in</button>
+                <div class="health-score-legend" aria-label="Health score legend">
+                  <div class="health-score-legend-row">
+                    <div class="health-score-segment">
+                      <span class="health-score-dot health-score-dot-early"></span>
+                      <div class="health-score-segment-copy">
+                        <div class="health-score-range">0-25</div>
+                        <div class="health-score-label-line">Early Stage</div>
+                      </div>
+                    </div>
+                    <div class="health-score-divider" aria-hidden="true"></div>
+                    <div class="health-score-segment health-score-segment-active">
+                      <span class="health-score-dot health-score-dot-developing"></span>
+                      <div class="health-score-segment-copy">
+                        <div class="health-score-range">26-40</div>
+                        <div class="health-score-label-line">Developing</div>
+                      </div>
+                    </div>
+                    <div class="health-score-divider" aria-hidden="true"></div>
+                    <div class="health-score-segment">
+                      <span class="health-score-dot health-score-dot-progressing"></span>
+                      <div class="health-score-segment-copy">
+                        <div class="health-score-range">41-55</div>
+                        <div class="health-score-label-line">Progressing</div>
+                      </div>
+                    </div>
+                    <div class="health-score-divider" aria-hidden="true"></div>
+                    <div class="health-score-segment">
+                      <span class="health-score-dot health-score-dot-advancing"></span>
+                      <div class="health-score-segment-copy">
+                        <div class="health-score-range">56-70</div>
+                        <div class="health-score-label-line">Advancing</div>
+                      </div>
+                    </div>
+                    <div class="health-score-divider" aria-hidden="true"></div>
+                    <div class="health-score-segment">
+                      <span class="health-score-dot health-score-dot-leading"></span>
+                      <div class="health-score-segment-copy">
+                        <div class="health-score-range">71-85</div>
+                        <div class="health-score-label-line health-score-label-strong">Leading</div>
+                      </div>
+                    </div>
+                    <div class="health-score-divider" aria-hidden="true"></div>
+                    <div class="health-score-segment">
+                      <span class="health-score-dot health-score-dot-pioneering"></span>
+                      <div class="health-score-segment-copy">
+                        <div class="health-score-range">86-100</div>
+                        <div class="health-score-label-line health-score-label-stronger">Pioneering</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div class="health-score-legend-note">Score reflects Intelligence Maturity across Strategy, People, Process, and Technology.</div>
+                </div>
               </div>
               <div class="card">
                 <div class="card-label">DIMENSION BREAKDOWN</div>
@@ -685,9 +842,9 @@
                   <tr><th>MONTH</th><th>OVERALL SCORE</th><th>STRATEGY</th><th>PEOPLE</th><th>PROCESS</th><th>TECHNOLOGY</th><th>REPORT</th></tr>
                 </thead>
                 <tbody>
-                  <tr><td>March 2025</td><td><span class="score-badge amber">67/100</span></td><td><span class="score-badge amber">A2</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge amber">A2</span></td><td><span class="score-badge amber">A2</span></td><td><a class="view-link" href="#">View →</a></td></tr>
-                  <tr><td>February 2025</td><td><span class="score-badge amber">63/100</span></td><td><span class="score-badge amber">A2</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge amber">A2</span></td><td><a class="view-link" href="#">View →</a></td></tr>
-                  <tr><td>January 2025</td><td><span class="score-badge red">58/100</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge red">A1</span></td><td><a class="view-link" href="#">View →</a></td></tr>
+                  <tr><td>March 2025</td><td><span class="score-badge amber" data-health-score-history-current></span></td><td><span class="score-badge amber">A2</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge amber">A2</span></td><td><span class="score-badge amber">A2</span></td><td><a class="view-link" href="#">View →</a></td></tr>
+                  <tr><td>February 2025</td><td><span class="score-badge amber" data-health-score-history-previous></span></td><td><span class="score-badge amber">A2</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge amber">A2</span></td><td><a class="view-link" href="#">View →</a></td></tr>
+                  <tr><td>January 2025</td><td><span class="score-badge red" data-health-score-history-baseline></span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge red">A1</span></td><td><span class="score-badge red">A1</span></td><td><a class="view-link" href="#">View →</a></td></tr>
                 </tbody>
               </table>
             </div>
@@ -941,10 +1098,8 @@
   var visitedPages = {};
 
   function triggerOrbFirstVisit() {
-    var orbs = document.querySelectorAll('.message-avatar.agent img, .aria-avatar-small img');
-    orbs.forEach(function(orb) {
-      var el = orb.closest('.message-avatar') || orb.closest('.aria-avatar-small');
-      if (!el) return;
+    var orbs = document.querySelectorAll('.message-avatar.agent');
+    orbs.forEach(function(el) {
       el.classList.remove('aria-orb-first-visit');
       void el.offsetWidth; // force reflow to restart animation
       el.classList.add('aria-orb-first-visit');
@@ -963,6 +1118,11 @@
     var page = document.getElementById('page-' + id);
     page.classList.add('active');
     replayAnimations(page);
+    if (id === 'askaria') {
+      requestAnimationFrame(function() {
+        triggerOrbFirstVisit();
+      });
+    }
     if (!visitedPages[id]) {
       visitedPages[id] = true;
       triggerOrbFirstVisit();

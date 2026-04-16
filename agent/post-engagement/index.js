@@ -4,7 +4,6 @@ import { fileURLToPath, pathToFileURL } from "url";
 
 import {
   buildPostEngagementContext,
-  generateSessionOpener,
   loadPostEngagementKnowledge,
   runProjectMemory,
   runProjectMemoryQA,
@@ -42,7 +41,6 @@ const __dirname = path.dirname(__filename);
 
 export {
   buildPostEngagementContext,
-  generateSessionOpener,
   loadPostEngagementKnowledge,
   runProjectMemory,
   runProjectMemoryQA,
