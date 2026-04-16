@@ -250,7 +250,8 @@
       /* Aria Briefing Card */
       .aria-briefing-card { background: linear-gradient(to right, #fff8f4, #fff); border-left: 3px solid #e8540b; border-radius: 12px; padding: 20px; margin-bottom: 16px; box-shadow: 0 2px 12px rgba(15,30,60,0.06); }
       .aria-briefing-inner { display: flex; align-items: flex-start; gap: 14px; }
-      .aria-avatar-small { width: 36px; height: 36px; border-radius: 50%; background: #e8540b; color: #fff; display: flex; align-items: center; justify-content: center; font-size: 15px; font-weight: 700; flex-shrink: 0; font-family: Georgia, "Times New Roman", serif; font-style: italic; }
+      .aria-avatar-small { width: 40px; height: 40px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; overflow: hidden; }
+      .aria-avatar-small img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
       .aria-briefing-label { font-size: 10px; letter-spacing: 2px; color: #e8540b; font-weight: 600; margin-bottom: 8px; text-transform: uppercase; }
       .aria-briefing-text { font-size: 15px; color: #0f1e3c; line-height: 1.7; }
       @keyframes shimmer { from { background-position: -600px 0; } to { background-position: 600px 0; } }
@@ -275,19 +276,51 @@
       .message.agent { background: transparent; color: #233044; padding: 2px 0; }
       .message-avatar { width: 32px; height: 32px; border-radius: 50%; flex-shrink: 0; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; letter-spacing: 0.04em; margin-top: 2px; }
       .message-avatar.user { background: #c9a55c; color: #0f1e3c; }
-      .message-avatar.agent { background: radial-gradient(circle at 35% 35%, #ffbe72 0%, #e87a30 58%, #c85f16 100%); color: #fff; box-shadow: 0 0 0 6px rgba(232, 122, 48, 0.10); animation: ariaPulse 2.8s ease-in-out infinite; font-family: Georgia, "Times New Roman", serif; font-style: italic; }
+      .message-avatar.agent { background: transparent; overflow: hidden; animation: ariaPulse 2.8s ease-in-out infinite; }
+      .message-avatar.agent img { width: 100%; height: 100%; object-fit: cover; border-radius: 50%; }
       @keyframes ariaPulse {
-        0%, 100% { transform: scale(1); box-shadow: 0 0 0 6px rgba(232, 122, 48, 0.10); }
-        50% { transform: scale(1.06); box-shadow: 0 0 0 10px rgba(232, 122, 48, 0.06); }
+        0%, 100% { transform: scale(1); filter: drop-shadow(0 0 4px rgba(232,122,48,0.18)); }
+        50% { transform: scale(1.07); filter: drop-shadow(0 0 8px rgba(232,122,48,0.28)); }
+      }
+
+      /* Orb expand animation — fires when a tab is visited for the first time */
+      @keyframes orbFirstVisit {
+        0%   { transform: scale(0.5);  opacity: 0; filter: drop-shadow(0 0 0px rgba(232,122,48,0)); }
+        55%  { transform: scale(1.18); opacity: 1; filter: drop-shadow(0 0 14px rgba(232,122,48,0.42)); }
+        75%  { transform: scale(0.94); filter: drop-shadow(0 0 6px rgba(232,122,48,0.22)); }
+        90%  { transform: scale(1.04); }
+        100% { transform: scale(1);   filter: drop-shadow(0 0 5px rgba(232,122,48,0.16)); }
+      }
+      .aria-orb-first-visit {
+        animation: ariaPulse 2.8s ease-in-out infinite, orbFirstVisit 0.85s cubic-bezier(0.22,1,0.36,1) both !important;
       }
       .message-row + .message-row { margin-top: 0; }
-      .composer textarea { min-height: 92px; max-height: 150px; width: 100%; resize: none; overflow-y: auto; border: 1px solid #d7dde5; border-radius: 16px; padding: 16px 18px; font: inherit; color: #1a2332; background: #fbfcfe; box-sizing: border-box; }
-      .composer textarea:focus { outline: 2px solid rgba(232, 122, 48, 0.18); border-color: rgba(15, 30, 60, 0.28); }
-      .composer-actions { margin-top: 12px; display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+      /* ── Composer / input box ── */
+      .composer-wrap { position: relative; background: #fff; border: 1.5px solid rgba(232,122,48,0.55); border-radius: 20px; box-shadow: 0 0 0 3px rgba(232,122,48,0.10); overflow: hidden; }
+      .composer-wrap:focus-within { border-color: rgba(232,122,48,0.85); box-shadow: 0 0 0 4px rgba(232,122,48,0.16); }
+      .composer textarea { min-height: 88px; max-height: 150px; width: 100%; resize: none; overflow-y: auto; border: none; outline: none; border-radius: 0; padding: 16px 18px 40px 18px; font: inherit; font-size: 14px; color: #1a2332; background: transparent; box-sizing: border-box; }
+      .composer textarea::placeholder { color: #a0aab8; }
+      .composer-bottom-bar { display: flex; align-items: center; justify-content: space-between; padding: 8px 12px 10px 14px; }
+      .composer-left { display: flex; align-items: center; gap: 8px; }
+      .attach-btn { width: 28px; height: 28px; border: none; background: none; cursor: pointer; display: inline-flex; align-items: center; justify-content: center; color: #8090a8; font-size: 18px; font-weight: 300; line-height: 1; border-radius: 50%; transition: background 0.15s, color 0.15s; padding: 0; }
+      .attach-btn:hover { background: rgba(232,122,48,0.10); color: #e8540b; }
       .status { margin: 0; color: #6b7a8d; font-size: 13px; }
-      #send-button { width: 40px; height: 40px; border: none; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0; background: #0f1e3c; color: #f7f4eb; cursor: pointer; transition: background 0.18s ease, transform 0.18s ease; }
-      #send-button:hover { background: #172a52; transform: translateY(-1px); }
-      #send-button svg { width: 18px; height: 18px; fill: currentColor; }
+      #send-button { width: 34px; height: 34px; border: none; border-radius: 50%; display: inline-flex; align-items: center; justify-content: center; padding: 0; background: #e8540b; color: #fff; cursor: pointer; transition: background 0.18s ease, transform 0.18s ease; flex-shrink: 0; }
+      #send-button:hover { background: #d04808; transform: translateY(-1px); }
+      #send-button svg { width: 16px; height: 16px; fill: currentColor; }
+
+      /* ── Suggestion chips ── */
+      .suggestion-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: -8px; padding-left: 46px; animation: chipsIn 0.35s 0.3s cubic-bezier(0.22,1,0.36,1) both; }
+      @keyframes chipsIn {
+        from { opacity: 0; transform: translateY(6px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .chip { display: inline-block; border: 1px solid #0f1e3c; background: #fff; color: #0f1e3c; font-size: 12px; font-family: inherit; padding: 8px 16px; border-radius: 999px; cursor: pointer; transition: background 0.18s, color 0.18s; white-space: nowrap; }
+      .chip:hover { background: #0f1e3c; color: #fff; }
+
+      /* ── Opening message pulse placeholder ── */
+      @keyframes openerPulse { 0%,100%{opacity:0.45} 50%{opacity:0.9} }
+      .opener-placeholder { height: 14px; border-radius: 6px; background: rgba(232,122,48,0.22); animation: openerPulse 1.4s ease-in-out infinite; width: 80%; }
 
       /* ── ANIMATIONS ── */
 
@@ -476,7 +509,7 @@
           <div class="page-body">
             <div id="aria-briefing-card" class="aria-briefing-card">
               <div class="aria-briefing-inner">
-                <div class="aria-avatar-small">A</div>
+                <div class="aria-avatar-small"><img src="aria-orb.svg" alt="Aria"/></div>
                 <div style="flex:1;min-width:0;">
                   <div class="aria-briefing-label">ARIA — Today's Briefing</div>
                   <div id="aria-briefing-text" class="aria-briefing-text">
@@ -557,14 +590,19 @@
             </div>
             <div class="chat-composer">
               <form id="chat-form" class="composer">
-                <textarea id="message-input" name="message" rows="3" placeholder="Describe what transformation challenge you're dealing with..." required aria-label="Your message"></textarea>
-                <div class="composer-actions">
-                  <p id="status" class="status" style="display:none"></p>
-                  <button id="send-button" type="submit" aria-label="Send message" title="Send message">
-                    <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
-                      <path d="M4.5 10h8.2l-3.4-3.4 1.4-1.4 5.8 5.8-5.8 5.8-1.4-1.4 3.4-3.4H4.5z"></path>
-                    </svg>
-                  </button>
+                <div class="composer-wrap">
+                  <textarea id="message-input" name="message" rows="3" placeholder="Type a message..." required aria-label="Your message"></textarea>
+                  <div class="composer-bottom-bar">
+                    <div class="composer-left">
+                      <button type="button" class="attach-btn" aria-label="Attach document" title="Attach document">+</button>
+                      <p id="status" class="status" style="display:none"></p>
+                    </div>
+                    <button id="send-button" type="submit" aria-label="Send message" title="Send message">
+                      <svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
+                        <path d="M4 12l8-8 8 8M12 4v16" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+                      </svg>
+                    </button>
+                  </div>
                 </div>
               </form>
             </div>
@@ -913,12 +951,35 @@
     });
   }
 
+  var visitedPages = {};
+
+  function triggerOrbFirstVisit() {
+    var orbs = document.querySelectorAll('.message-avatar.agent img, .aria-avatar-small img');
+    orbs.forEach(function(orb) {
+      var el = orb.closest('.message-avatar') || orb.closest('.aria-avatar-small');
+      if (!el) return;
+      el.classList.remove('aria-orb-first-visit');
+      void el.offsetWidth; // force reflow to restart animation
+      el.classList.add('aria-orb-first-visit');
+      el.addEventListener('animationend', function handler(e) {
+        if (e.animationName === 'orbFirstVisit') {
+          el.classList.remove('aria-orb-first-visit');
+          el.removeEventListener('animationend', handler);
+        }
+      });
+    });
+  }
+
   function showPage(id) {
     document.querySelectorAll('.page').forEach(function(p) { p.classList.remove('active'); });
     document.querySelectorAll('.nav-item').forEach(function(n) { n.classList.remove('active'); });
     var page = document.getElementById('page-' + id);
     page.classList.add('active');
     replayAnimations(page);
+    if (!visitedPages[id]) {
+      visitedPages[id] = true;
+      triggerOrbFirstVisit();
+    }
     var navBtn = document.querySelector('.nav-item[data-page="' + id + '"]');
     if (navBtn) navBtn.classList.add('active');
     var layout = document.querySelector('.layout');
@@ -993,6 +1054,10 @@
     // Replay animations on initial load
     var activePage = document.querySelector('.page.active');
     if (activePage) replayAnimations(activePage);
+
+    // Mark dashboard as visited and trigger orb entry on load
+    visitedPages['dashboard'] = true;
+    setTimeout(function() { triggerOrbFirstVisit(); }, 200);
   });
 </script>
     <script type="module" src="/app.js"></script>
