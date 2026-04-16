@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" role="img" aria-label="CGS Momentum favicon">
+  <rect x="0" y="0" width="64" height="64" rx="16" fill="#e8540b"/>
+  <path
+    d="M14 34h11l5-14 8 26 6-18h6"
+    fill="none"
+    stroke="#ffffff"
+    stroke-width="5"
+    stroke-linecap="round"
+    stroke-linejoin="round"
+  />
+</svg>
