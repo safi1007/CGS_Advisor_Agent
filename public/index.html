@@ -513,12 +513,18 @@
       .reports-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
       .reports-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
       .reports-row.cols-1 { grid-template-columns: 1fr; }
-      /* Horizontal scroll row for health reports */
-      .reports-row.cols-scroll { display: flex; flex-direction: row; overflow-x: auto; gap: 16px; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #dde2ea transparent; }
-      .reports-row.cols-scroll::-webkit-scrollbar { height: 4px; }
-      .reports-row.cols-scroll::-webkit-scrollbar-track { background: transparent; }
-      .reports-row.cols-scroll::-webkit-scrollbar-thumb { background: #dde2ea; border-radius: 4px; }
-      .reports-row.cols-scroll .rcard { min-width: 268px; max-width: 268px; flex-shrink: 0; scroll-snap-align: start; }
+      /* ── Gallery carousel (Health Reports) ── */
+      .reports-carousel-wrap { position: relative; }
+      .reports-carousel-viewport { overflow: hidden; }
+      .reports-carousel-track { display: flex; gap: 16px; transition: transform 0.38s cubic-bezier(0.22,1,0.36,1); }
+      .reports-carousel-track .rcard { min-width: calc((100% - 32px) / 3); max-width: calc((100% - 32px) / 3); flex-shrink: 0; }
+      .carousel-nav { display: flex; align-items: center; justify-content: flex-end; gap: 6px; margin-top: 14px; }
+      .carousel-btn { width: 32px; height: 32px; border-radius: 50%; border: 1.5px solid #e4e6ea; background: #fff; color: #4a5568; cursor: pointer; display: flex; align-items: center; justify-content: center; transition: background 0.15s, border-color 0.15s, color 0.15s; flex-shrink: 0; }
+      .carousel-btn:hover:not(:disabled) { background: #0f1e3c; border-color: #0f1e3c; color: #fff; }
+      .carousel-btn:disabled { opacity: 0.3; cursor: default; }
+      .carousel-dots { display: flex; gap: 5px; align-items: center; margin-right: auto; }
+      .carousel-dot { width: 6px; height: 6px; border-radius: 50%; background: #dde2ea; transition: background 0.2s, width 0.2s; }
+      .carousel-dot.active { background: #0f1e3c; width: 16px; border-radius: 3px; }
       .rcard { background: #fff; border-radius: 14px; border: 0.5px solid #e2e6ea; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.22s ease, transform 0.22s ease; }
       .rcard:hover { box-shadow: 0 10px 32px rgba(37,99,235,0.13); transform: translateY(-3px); }
       .rcard-banner { padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 106px; position: relative; overflow: hidden; }
@@ -540,6 +546,11 @@
       .rcard-btn button:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
       .rcard-btn button.active-btn { background: #0f1e3c; border-color: #0f1e3c; color: #fff; }
       .rcard-btn button.active-btn:hover { background: #1a2e50; }
+      /* Plain white doc card (Board Briefings, Stakeholder Comms) */
+      .rcard-doc-header { padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 10px; border-bottom: 1px solid #f0f2f6; }
+      .rcard-doc-icon { width: 34px; height: 34px; border-radius: 9px; background: #f0f2f6; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #0f1e3c; }
+      .rcard-doc-title { font-size: 14px; font-weight: 600; color: #0f1e3c; line-height: 1.4; }
+      .rcard-doc-tag { display: inline-flex; align-items: center; font-size: 10px; font-weight: 600; letter-spacing: 0.6px; text-transform: uppercase; color: #a0aab8; margin-bottom: 2px; }
 
       /* ── Report Modal ── */
       .report-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(8,14,28,0.55); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
@@ -1306,9 +1317,11 @@
               <div class="reports-section-header">
                 <span class="reports-section-label">HEALTH REPORTS</span>
                 <div class="reports-section-line"></div>
-                <span class="reports-section-count">5 documents · scroll →</span>
+                <span class="reports-section-count">6 documents</span>
               </div>
-              <div class="reports-row cols-scroll">
+              <div class="reports-carousel-wrap">
+              <div class="reports-carousel-viewport">
+              <div class="reports-carousel-track" id="health-carousel-track">
 
                 <!-- Apr 2026 — Latest, clickable -->
                 <div class="rcard">
@@ -1385,7 +1398,33 @@
                   </div>
                 </div>
 
+                <!-- Q1 2025 — Interim -->
+                <div class="rcard">
+                  <div class="rcard-banner blue">
+                    <div class="rcard-banner-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
+                    <div class="rcard-banner-title">Q1 2025 Health Report <span style="font-size:10px;opacity:0.65;font-weight:400;">· 90-Day Check-in</span></div>
+                    <div class="rcard-score-row"><span class="rcard-score-pill">24/100</span><span class="rcard-score-pill">Early Stage</span></div>
+                  </div>
+                  <div class="rcard-body">
+                    <div class="rcard-meta">Generated by Aria · Jan 20, 2025</div>
+                    <div class="rcard-summary">First 90-day check-in post-baseline. Executive alignment workshop delivered; leadership now aligned on 2–3 year connected vehicle timeline.</div>
+                    <div class="rcard-dims"><span class="rcard-dim">Strategy A2</span><span class="rcard-dim">People A1</span><span class="rcard-dim">Process A1</span><span class="rcard-dim">Tech A1</span></div>
+                    <div class="rcard-btn"><button>View Report →</button></div>
+                  </div>
+                </div>
+
+              </div><!-- /track -->
+              </div><!-- /viewport -->
+              <div class="carousel-nav">
+                <div class="carousel-dots" id="health-carousel-dots"></div>
+                <button class="carousel-btn" id="health-carousel-prev" aria-label="Previous" disabled>
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M12.707 5.293a1 1 0 010 1.414L9.414 10l3.293 3.293a1 1 0 01-1.414 1.414l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 0z"/></svg>
+                </button>
+                <button class="carousel-btn" id="health-carousel-next" aria-label="Next">
+                  <svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M7.293 14.707a1 1 0 010-1.414L10.586 10 7.293 6.707a1 1 0 011.414-1.414l4 4a1 1 0 010 1.414l-4 4a1 1 0 01-1.414 0z"/></svg>
+                </button>
               </div>
+              </div><!-- /carousel-wrap -->
             </div>
 
             <!-- BOARD BRIEFINGS -->
@@ -1393,35 +1432,57 @@
               <div class="reports-section-header">
                 <span class="reports-section-label">BOARD BRIEFINGS</span>
                 <div class="reports-section-line"></div>
-                <span class="reports-section-count">2 documents</span>
+                <span class="reports-section-count">3 documents</span>
               </div>
-              <div class="reports-row cols-2">
+              <div class="reports-row cols-3">
+
+                <!-- Newest → left -->
                 <div class="rcard">
-                  <div class="rcard-banner navy">
-                    <div class="rcard-banner-icon">
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+                  <div class="rcard-doc-header">
+                    <div class="rcard-doc-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg></div>
+                    <div>
+                      <div class="rcard-doc-tag">Q2 2026 · CDO Hire Update</div>
+                      <div class="rcard-doc-title">Board Briefing — CDO Hire & Phase 1 Approval</div>
                     </div>
-                    <div class="rcard-banner-title">Q1 2026 Board Briefing — Digital Strategy Update</div>
                   </div>
                   <div class="rcard-body">
-                    <div class="rcard-meta">Generated by Aria · March 28, 2026</div>
-                    <div class="rcard-pages">6 pages · Q1 2026</div>
+                    <div class="rcard-meta">Generated by Aria · Apr 14, 2026 · 4 pages</div>
+                    <div class="rcard-summary">Pre-read for the May board meeting. Covers CDO final-round status, Phase 1 infrastructure ROI case ($3.2M), and updated OEM partner timeline.</div>
                     <div class="rcard-btn"><button>View Report →</button></div>
                   </div>
                 </div>
+
                 <div class="rcard">
-                  <div class="rcard-banner navy">
-                    <div class="rcard-banner-icon">
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg>
+                  <div class="rcard-doc-header">
+                    <div class="rcard-doc-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg></div>
+                    <div>
+                      <div class="rcard-doc-tag">Q1 2026 · Digital Strategy Update</div>
+                      <div class="rcard-doc-title">Board Briefing — Progress & Capability Roadmap</div>
                     </div>
-                    <div class="rcard-banner-title">Q4 2024 Board Briefing — Transformation Kickoff</div>
                   </div>
                   <div class="rcard-body">
-                    <div class="rcard-meta">Generated by Aria · Nov 15, 2024</div>
-                    <div class="rcard-pages">5 pages · Q4 2024</div>
+                    <div class="rcard-meta">Generated by Aria · Mar 28, 2026 · 6 pages</div>
+                    <div class="rcard-summary">Mid-program update covering health score progress, CDO search status, and revised timeline for OEM pilot readiness by Dec 2026.</div>
                     <div class="rcard-btn"><button>View Report →</button></div>
                   </div>
                 </div>
+
+                <!-- Oldest → right -->
+                <div class="rcard">
+                  <div class="rcard-doc-header">
+                    <div class="rcard-doc-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/></svg></div>
+                    <div>
+                      <div class="rcard-doc-tag">Q4 2024 · Transformation Kickoff</div>
+                      <div class="rcard-doc-title">Board Briefing — Connected Vehicle Strategy Launch</div>
+                    </div>
+                  </div>
+                  <div class="rcard-body">
+                    <div class="rcard-meta">Generated by Aria · Nov 15, 2024 · 5 pages</div>
+                    <div class="rcard-summary">Formal launch of the Connected Vehicle Strategy program. Sets out the 3-year roadmap, investment thesis, and CGS engagement scope for board approval.</div>
+                    <div class="rcard-btn"><button>View Report →</button></div>
+                  </div>
+                </div>
+
               </div>
             </div>
 
@@ -1433,32 +1494,39 @@
                 <span class="reports-section-count">2 documents</span>
               </div>
               <div class="reports-row cols-3">
+
+                <!-- Oldest → left -->
                 <div class="rcard">
-                  <div class="rcard-banner teal">
-                    <div class="rcard-banner-icon">
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884zM18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg>
+                  <div class="rcard-doc-header">
+                    <div class="rcard-doc-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884zM18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/></svg></div>
+                    <div>
+                      <div class="rcard-doc-tag">Mar 2026 · CFO Brief</div>
+                      <div class="rcard-doc-title">Investment Case — Phase 1 Data Infrastructure</div>
                     </div>
-                    <div class="rcard-banner-title">CFO Alignment — Investment Case for Phase 1</div>
                   </div>
                   <div class="rcard-body">
-                    <div class="rcard-meta">Generated by Aria · March 15, 2026</div>
-                    <div class="rcard-summary">ROI brief covering the $3.2M Phase 1 data infrastructure spend. Positions investment against OEM readiness risk and lost revenue exposure.</div>
+                    <div class="rcard-meta">Generated by Aria · Mar 15, 2026 · 2 pages</div>
+                    <div class="rcard-summary">ROI brief covering the $3.2M Phase 1 spend. Positions investment against OEM readiness risk and quantifies lost revenue exposure if delayed.</div>
                     <div class="rcard-btn"><button>View Report →</button></div>
                   </div>
                 </div>
+
+                <!-- Latest → right -->
                 <div class="rcard">
-                  <div class="rcard-banner teal">
-                    <div class="rcard-banner-icon">
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 14.094A5.973 5.973 0 004 17v1H1v-1a3 3 0 013.75-2.906z"/></svg>
+                  <div class="rcard-doc-header">
+                    <div class="rcard-doc-icon"><svg width="16" height="16" viewBox="0 0 20 20" fill="currentColor"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 14.094A5.973 5.973 0 004 17v1H1v-1a3 3 0 013.75-2.906z"/></svg></div>
+                    <div>
+                      <div class="rcard-doc-tag">Apr 2026 · Board Prep</div>
+                      <div class="rcard-doc-title">OEM Competitive Threat — Board Member Briefing</div>
                     </div>
-                    <div class="rcard-banner-title">Board Member Briefing — OEM Competitive Threat</div>
                   </div>
                   <div class="rcard-body">
-                    <div class="rcard-meta">Generated by Aria · April 8, 2026</div>
-                    <div class="rcard-summary">Targeted briefing for two uninformed board members. Outlines the 2026–2027 OEM digital requirements shift and Meridian's current readiness gap.</div>
+                    <div class="rcard-meta">Generated by Aria · Apr 8, 2026 · 3 pages</div>
+                    <div class="rcard-summary">Targeted brief for two uninformed board members. Outlines the 2026–2027 OEM digital requirements shift and Meridian's current readiness gap.</div>
                     <div class="rcard-btn"><button>View Report →</button></div>
                   </div>
                 </div>
+
               </div>
             </div>
 
@@ -2298,6 +2366,46 @@
     document.getElementById('report-modal-overlay').classList.remove('open');
     document.body.style.overflow = '';
   }
+
+  // ── Health Reports Carousel ──
+  (function() {
+    const VISIBLE = 3;
+    const track   = document.getElementById('health-carousel-track');
+    const prevBtn = document.getElementById('health-carousel-prev');
+    const nextBtn = document.getElementById('health-carousel-next');
+    const dotsEl  = document.getElementById('health-carousel-dots');
+    if (!track) return;
+
+    const cards = Array.from(track.children);
+    const total = cards.length;
+    const pages = total - VISIBLE + 1; // how many positions we can slide to
+    let current = 0;
+
+    // Build dots
+    for (let i = 0; i < pages; i++) {
+      const d = document.createElement('div');
+      d.className = 'carousel-dot' + (i === 0 ? ' active' : '');
+      dotsEl.appendChild(d);
+    }
+
+    function getCardWidth() {
+      return cards[0] ? cards[0].getBoundingClientRect().width + 16 : 0; // width + gap
+    }
+
+    function goTo(idx) {
+      current = Math.max(0, Math.min(idx, pages - 1));
+      track.style.transform = `translateX(-${current * getCardWidth()}px)`;
+      prevBtn.disabled = current === 0;
+      nextBtn.disabled = current >= pages - 1;
+      dotsEl.querySelectorAll('.carousel-dot').forEach((d, i) => {
+        d.classList.toggle('active', i === current);
+      });
+    }
+
+    prevBtn.addEventListener('click', () => goTo(current - 1));
+    nextBtn.addEventListener('click', () => goTo(current + 1));
+    goTo(0);
+  })();
   </script>
   </body>
 </html>
