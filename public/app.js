@@ -2,12 +2,14 @@ const CURRENT_HEALTH_SCORE = 29;
 const PREVIOUS_HEALTH_SCORE = 27;
 const HEALTH_SCORE_LABEL = "Developing";
 const HEALTH_SCORE_TREND = "+2 from last month";
-const BASELINE_HEALTH_SCORE = PREVIOUS_HEALTH_SCORE - 2;
+const BASELINE_HEALTH_SCORE = 23;
 const HEALTH_SCORE_RING_RADIUS = 48;
 const HEALTH_SCORE_RING_CIRCUMFERENCE = 2 * Math.PI * HEALTH_SCORE_RING_RADIUS;
 const CHAT_MESSAGE_AVATAR_SIZE = 34;
 const SESSION_OPENER_TEXT =
   "CDO Hired & Onboarded is still the milestone that will determine whether the rest of Meridian's roadmap moves on time. What feels most at risk right now?";
+const MONTHLY_PROGRESS_REPORT_PROMPT = "Generate my monthly progress report";
+const REPORT_STORAGE_KEY = "lastReportMonth";
 
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
@@ -17,6 +19,18 @@ const sendButtonEl = document.getElementById("send-button");
 const layoutEl = document.querySelector(".layout");
 const mobileMenuToggleEl = document.querySelector(".mobile-menu-toggle");
 const sidebarOverlayEl = document.querySelector(".sidebar-overlay");
+const dashboardReportDueEl = document.getElementById("dashboard-report-due");
+const dashboardReportProgressFillEl = document.getElementById(
+  "dashboard-report-progress-fill"
+);
+const dashboardReportButtonEl = document.getElementById("dashboard-report-button");
+const dashboardReportBannerEl = document.getElementById("dashboard-report-banner");
+const dashboardReportBannerLinkEl = document.getElementById(
+  "dashboard-report-banner-link"
+);
+const dashboardReportBannerCloseEl = document.getElementById(
+  "dashboard-report-banner-close"
+);
 
 const conversationHistory = [];
 let conversationState = null;
@@ -50,6 +64,12 @@ const sendArrowIcon = `
 const stopIcon = `
   <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
     <rect x="5.5" y="5.5" width="9" height="9" rx="1.5"></rect>
+  </svg>
+`;
+
+const reportDueTodayIcon = `
+  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+    <path d="M11.5 2.5L5.5 10h4l-1 7.5 6-8h-4l1-7Z" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/>
   </svg>
 `;
 
@@ -128,6 +148,69 @@ function scrollMessagesToBottom() {
     top: messagesEl.scrollHeight,
     behavior: "smooth",
   });
+}
+
+function getCurrentReportMonth(date = new Date()) {
+  const year = date.getFullYear();
+  const month = String(date.getMonth() + 1).padStart(2, "0");
+  return `${year}-${month}`;
+}
+
+function formatMonthDayYear(date) {
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    day: "numeric",
+    year: "numeric",
+  });
+}
+
+function updateMonthlyProgressReportUI() {
+  const now = new Date();
+  const currentMonthKey = getCurrentReportMonth(now);
+  const lastReportMonth = localStorage.getItem(REPORT_STORAGE_KEY);
+  const reportGeneratedThisMonth = lastReportMonth === currentMonthKey;
+  const year = now.getFullYear();
+  const month = now.getMonth();
+  const totalDaysInMonth = new Date(year, month + 1, 0).getDate();
+  const dayOfMonth = now.getDate();
+  const monthProgress = Math.min((dayOfMonth / totalDaysInMonth) * 100, 100);
+  const firstOfNextMonth = new Date(year, month + 1, 1);
+  const msPerDay = 24 * 60 * 60 * 1000;
+  const daysUntilNextReport = Math.max(
+    0,
+    Math.ceil((firstOfNextMonth - now) / msPerDay)
+  );
+
+  if (dashboardReportProgressFillEl) {
+    dashboardReportProgressFillEl.style.width = `${monthProgress}%`;
+  }
+
+  if (dashboardReportDueEl) {
+    dashboardReportDueEl.classList.toggle("is-due-today", !reportGeneratedThisMonth);
+    if (reportGeneratedThisMonth) {
+      dashboardReportDueEl.textContent = `Next report due in ${daysUntilNextReport} day${
+        daysUntilNextReport === 1 ? "" : "s"
+      } — ${formatMonthDayYear(firstOfNextMonth)}`;
+    } else {
+      dashboardReportDueEl.innerHTML = `${reportDueTodayIcon}<span>Report due today — Aria is ready to generate</span>`;
+    }
+  }
+
+  if (dashboardReportBannerEl) {
+    dashboardReportBannerEl.hidden = reportGeneratedThisMonth;
+  }
+}
+
+async function triggerMonthlyProgressReportFlow() {
+  if (typeof showPage === "function") {
+    showPage("askaria");
+  }
+  if (isRequestInFlight) {
+    return;
+  }
+  inputEl.value = "";
+  autoResizeInput();
+  await sendMessage(MONTHLY_PROGRESS_REPORT_PROMPT);
 }
 
 function autoResizeInput() {
@@ -380,6 +463,16 @@ async function sendMessage(content) {
     hideThinkingIndicator();
     conversationHistory.push({ role: "assistant", content: data.reply });
     addMessage("agent", data.reply);
+
+    if (
+      content.trim().toLowerCase() ===
+      MONTHLY_PROGRESS_REPORT_PROMPT.toLowerCase()
+    ) {
+      localStorage.setItem(REPORT_STORAGE_KEY, getCurrentReportMonth());
+      updateMonthlyProgressReportUI();
+    }
+
+    checkEscalation(data);
   } catch (error) {
     hideThinkingIndicator();
 
@@ -463,6 +556,21 @@ autoResizeInput();
 setBusyState(false);
 applyHealthScoreContent();
 renderStaticAriaAvatars();
+updateMonthlyProgressReportUI();
+
+dashboardReportButtonEl?.addEventListener("click", () => {
+  triggerMonthlyProgressReportFlow();
+});
+
+dashboardReportBannerLinkEl?.addEventListener("click", () => {
+  triggerMonthlyProgressReportFlow();
+});
+
+dashboardReportBannerCloseEl?.addEventListener("click", () => {
+  if (dashboardReportBannerEl) {
+    dashboardReportBannerEl.hidden = true;
+  }
+});
 
 // --- Suggestion chips ---
 const CHIP_TEXTS = [
@@ -569,3 +677,309 @@ function loadSessionOpener() {
 }
 
 loadSessionOpener();
+
+// ── Integrations connect state ──────────────────────────────────────────────
+const integrationState = { gmail: true, gcal: true };
+
+function applyIntegrationState() {
+  document.querySelectorAll(".intg-connect-btn[data-intg-id]").forEach((btn) => {
+    const id = btn.getAttribute("data-intg-id");
+    if (integrationState[id]) {
+      setConnected(btn);
+    }
+    btn.addEventListener("click", () => {
+      if (integrationState[id]) return;
+      integrationState[id] = true;
+      setConnected(btn);
+    });
+  });
+}
+
+function setConnected(btn) {
+  btn.classList.add("connected");
+  btn.textContent = "Connected";
+  btn.disabled = true;
+}
+
+applyIntegrationState();
+
+// ── Escalation banner ────────────────────────────────────────────────────────
+const ESCALATION_PHRASES = [
+  "sarah should be",
+  "bring sarah in",
+  "human consultant",
+  "escalating this",
+  "beyond what aria",
+  "i want to flag",
+  "this warrants",
+  "prepare a briefing",
+];
+
+let escalationShown = false;
+let escalationDismissed = false;
+
+function checkEscalation(data) {
+  if (escalationShown || escalationDismissed) return;
+
+  const replyLower = (data.reply || "").toLowerCase();
+  const triggeredByPhrase = ESCALATION_PHRASES.some((p) => replyLower.includes(p));
+  const triggeredByFlag = data.escalationDetected === true;
+
+  if (!triggeredByPhrase && !triggeredByFlag) return;
+
+  const banner = document.getElementById("escalation-banner");
+  if (!banner) return;
+
+  escalationShown = true;
+  banner.style.display = "flex";
+  banner.style.animation = "none";
+  // Force reflow so re-adding animation plays from scratch
+  void banner.offsetWidth;
+  banner.style.animation = "slideDown 0.3s ease";
+}
+
+(function initEscalationBanner() {
+  const banner = document.getElementById("escalation-banner");
+  const contactBtn = document.getElementById("escalation-contact-btn");
+  const dismissBtn = document.getElementById("escalation-dismiss-btn");
+  if (!banner || !contactBtn || !dismissBtn) return;
+
+  contactBtn.addEventListener("click", () => {
+    window.location.href =
+      `mailto:sarah.chen@cgsadvisors.com` +
+      `?subject=CGS%20Momentum%20Escalation%20%E2%80%94%20Meridian%20Automotive` +
+      `&body=Hi%20Sarah%2C%0A%0AAria%20has%20flagged%20a%20situation%20in%20my%20CGS%20Momentum%20session%20that%20may%20need%20your%20direct%20involvement.%0A%0AClient%3A%20James%20Whitfield%2C%20Meridian%20Automotive%0ADate%3A%20${encodeURIComponent(new Date().toLocaleDateString())}%0A%0APlease%20review%20when%20you%20have%20a%20moment.%0A%0AJames`;
+  });
+
+  dismissBtn.addEventListener("click", () => {
+    escalationDismissed = true;
+    banner.style.animation = "escalationFadeOut 0.25s ease forwards";
+    setTimeout(() => { banner.style.display = "none"; }, 260);
+  });
+})();
+
+// ── Sync all derived counts from DOM ────────────────────────────────────────
+// Call this whenever content is added or removed anywhere. It reads the live
+// DOM so you never have to manually update a count string again — just add or
+// remove the relevant HTML element and call syncUICounts().
+function syncUICounts() {
+  // ── Reports page: total document count in the page header ──
+  const reportsHeaderCount = document.querySelector("#page-reports .page-header > span");
+  if (reportsHeaderCount) {
+    const total = document.querySelectorAll("#page-reports .rcard").length;
+    // Preserve the "· Last generated …" portion so it doesn't get wiped
+    const existing = reportsHeaderCount.textContent;
+    const datePart = existing.includes("Last generated")
+      ? existing.slice(existing.indexOf("Last generated"))
+      : null;
+    reportsHeaderCount.textContent =
+      `${total} document${total !== 1 ? "s" : ""}` +
+      (datePart ? ` · ${datePart}` : "");
+  }
+
+  // ── Reports page: per-section counts ──
+  document.querySelectorAll("#page-reports .reports-section").forEach((section) => {
+    const countEl = section.querySelector(".reports-section-count");
+    if (!countEl) return;
+    const n = section.querySelectorAll(".rcard").length;
+    const keepScroll = countEl.textContent.includes("scroll");
+    countEl.textContent = `${n} document${n !== 1 ? "s" : ""}${keepScroll ? " · scroll →" : ""}`;
+  });
+
+  // ── Integrations page: available count ──
+  const intgLabel = document.querySelector("#page-brain-integrations .intg-section-label");
+  if (intgLabel) {
+    const n = document.querySelectorAll("#page-brain-integrations .intg-card").length;
+    intgLabel.textContent = `AVAILABLE (${n})`;
+  }
+
+  // ── Knowledge Base: active document count shown in the section label ──
+  const kbLabel = document.querySelector("#page-brain-knowledge .kb-section-count");
+  if (kbLabel) {
+    const n = document.querySelectorAll("#kb-table tbody tr").length;
+    kbLabel.textContent = `${n} document${n !== 1 ? "s" : ""}`;
+  }
+
+  // ── Memory: row count shown in the section label ──
+  const memLabel = document.querySelector("#page-brain-memory .mem-section-count");
+  if (memLabel) {
+    const n = document.querySelectorAll("#mem-table tbody tr").length;
+    memLabel.textContent = `${n} entr${n !== 1 ? "ies" : "y"}`;
+  }
+}
+
+// ── Knowledge Base — upload drop zone ───────────────────────────────────────
+(function () {
+  const dropzone = document.getElementById("kb-dropzone");
+  const fileInput = document.getElementById("kb-file-input");
+  if (!dropzone || !fileInput) return;
+
+  function addUploadingRow(name) {
+    const tbody = document.querySelector("#kb-table tbody");
+    if (!tbody) return;
+    const ext = name.split(".").pop().toUpperCase() || "FILE";
+    const tr = document.createElement("tr");
+    tr.innerHTML = `
+      <td class="kb-name">
+        <svg class="kb-file-icon" viewBox="0 0 16 20" fill="none">
+          <path d="M9 1H3a2 2 0 00-2 2v14a2 2 0 002 2h10a2 2 0 002-2V7L9 1z" stroke="#6b7a8d" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+          <polyline points="9 1 9 7 15 7" stroke="#6b7a8d" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round"/>
+        </svg>
+        ${name}
+      </td>
+      <td><span class="kb-type-badge">${ext}</span></td>
+      <td class="kb-meta">Just now</td>
+      <td class="kb-meta">—</td>
+      <td><span class="kb-status-processing"><span class="kb-dot-processing"></span>Processing</span></td>`;
+    tbody.appendChild(tr);
+    syncUICounts(); // KB document count updates immediately on upload
+    // After 2s switch to Active
+    setTimeout(() => {
+      const statusCell = tr.querySelector("td:last-child");
+      statusCell.innerHTML = `<span class="kb-status-active"><span class="kb-dot"></span>Active</span>`;
+    }, 2000);
+  }
+
+  function handleFiles(files) {
+    Array.from(files).forEach((f) => addUploadingRow(f.name));
+  }
+
+  dropzone.addEventListener("click", () => fileInput.click());
+  dropzone.addEventListener("keydown", (e) => { if (e.key === "Enter" || e.key === " ") fileInput.click(); });
+  fileInput.addEventListener("change", () => { handleFiles(fileInput.files); fileInput.value = ""; });
+
+  dropzone.addEventListener("dragover", (e) => { e.preventDefault(); dropzone.classList.add("drag-over"); });
+  dropzone.addEventListener("dragleave", () => dropzone.classList.remove("drag-over"));
+  dropzone.addEventListener("drop", (e) => {
+    e.preventDefault();
+    dropzone.classList.remove("drag-over");
+    handleFiles(e.dataTransfer.files);
+  });
+})();
+
+// ── Memory — delete row ──────────────────────────────────────────────────────
+document.addEventListener("click", function (e) {
+  const btn = e.target.closest(".mem-del-btn");
+  if (!btn) return;
+  const row = btn.closest("tr");
+  if (!row) return;
+  row.style.transition = "opacity 0.2s ease";
+  row.style.opacity = "0";
+  setTimeout(() => { row.remove(); syncUICounts(); }, 200);
+});
+
+// ── Doc sidebar ─────────────────────────────────────────────────────────────
+function openDocSidebar() {
+  var el = document.getElementById('doc-sidebar');
+  if (el) el.classList.add('open');
+}
+
+function closeDocSidebar() {
+  var el = document.getElementById('doc-sidebar');
+  if (el) el.classList.remove('open');
+}
+
+function downloadDocContent() {
+  var lines = [
+    'BOARD BRIEFING: DIGITAL TRANSFORMATION PROGRESS',
+    'Meridian Automotive Group · April 2026 · CONFIDENTIAL',
+    '',
+    'EXECUTIVE SUMMARY',
+    'Meridian Automotive Group has made measured but deliberate progress across its digital',
+    'transformation agenda since programme inception in October 2024. With sixteen months of',
+    'engagement now complete, the overall maturity score sits at 29/100 — placing the',
+    'organisation in the Developing band — with clear upward momentum as the CDO hire',
+    'approaches final decision.',
+    '',
+    'The primary lever for accelerated improvement remains the People dimension, which',
+    'continues to hold at A1 due to the absence of senior digital leadership. A confirmed CDO',
+    'appointment in Q2 2026 is expected to unlock meaningful score movement across all four',
+    'dimensions within 60 days of onboarding.',
+    '',
+    'TRANSFORMATION STATUS',
+    'Dimension   | Score | Status',
+    '------------|-------|------------------',
+    'Strategy    | A2    | Stable',
+    'People      | A1    | Critical blocker',
+    'Process     | A2    | Stable',
+    'Technology  | A2    | Stable',
+    '',
+    'TOP THREE RISKS',
+    '1. CDO hire delay — final-round decision must close by end of April 2026 to preserve',
+    '   Q2 momentum targets.',
+    '2. OEM integration timeline — external dependency on Tier 1 partner roadmap creates a',
+    '   six-week uncertainty window for the data infrastructure build-out.',
+    '3. Board alignment gap — two board members remain uncommitted on the Phase 2 investment',
+    '   case; a briefing and Q&A session is recommended before the June planning cycle.',
+    '',
+    'DECISIONS REQUIRED',
+    '1. Approve CDO final-round candidates and confirm offer authority with the CEO and CHRO',
+    '   before the end of Q2.',
+    '',
+    '---',
+    'Prepared with intelligence support from CGS Momentum / Aria',
+  ];
+  var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url;
+  a.download = 'Q2_2026_Board_Briefing.txt';
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+// Mock doc delivery message — injected after the session opener
+(function addMockDocMessage() {
+  var row = document.createElement('article');
+  row.className = 'message-row agent';
+
+  var avatarEl = document.createElement('div');
+  avatarEl.className = 'message-avatar agent';
+  avatarEl.innerHTML = ariaAvatarSVG(CHAT_MESSAGE_AVATAR_SIZE);
+
+  var bodyEl = document.createElement('div');
+  bodyEl.className = 'message-body';
+
+  var bubbleEl = document.createElement('article');
+  bubbleEl.className = 'message agent';
+  bubbleEl.textContent = 'Your board briefing is ready. I have covered your milestone status, the top three risks for Northlake, and the two decisions you need from this meeting.';
+
+  var chipEl = document.createElement('div');
+  chipEl.className = 'doc-chip';
+  chipEl.setAttribute('role', 'button');
+  chipEl.setAttribute('tabindex', '0');
+  chipEl.setAttribute('aria-label', 'Q2 2026 Board Briefing — click to preview');
+  chipEl.innerHTML =
+    '<div class="doc-chip-icon">' +
+      '<svg width="11" height="11" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)">' +
+        '<path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>' +
+      '</svg>' +
+    '</div>' +
+    '<span class="doc-chip-name">Q2 2026 Board Briefing</span>' +
+    '<button class="doc-chip-dl" type="button">↓ PDF</button>';
+
+  chipEl.addEventListener('click', function(e) {
+    if (e.target.classList.contains('doc-chip-dl')) {
+      e.stopPropagation();
+      downloadDocContent();
+    } else {
+      openDocSidebar();
+    }
+  });
+  chipEl.addEventListener('keydown', function(e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDocSidebar(); }
+  });
+
+  bodyEl.appendChild(bubbleEl);
+  bodyEl.appendChild(chipEl);
+  row.appendChild(avatarEl);
+  row.appendChild(bodyEl);
+  messagesEl.appendChild(row);
+})();
+
+// ── Initial sync — run once DOM is fully read ────────────────────────────────
+// Any future HTML edit (new rcard, new intg-card, etc.) is automatically
+// reflected in all count labels without touching JS.
+syncUICounts();
