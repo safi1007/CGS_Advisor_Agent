@@ -216,7 +216,7 @@
   border: none;
   background: none;
   color: #c8a96e;
-  font-family: "DM Sans", sans-serif;
+  font-family: "Inter", sans-serif;
   font-size: 12px;
   cursor: pointer;
   border-radius: 8px;
@@ -371,7 +371,7 @@
 
 .health-score-legend {
   margin-top: 18px;
-  font-family: "DM Sans", sans-serif;
+  font-family: "Inter", sans-serif;
 }
 
 .health-score-legend-row {
