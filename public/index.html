@@ -501,6 +501,12 @@
       .reports-row.cols-3 { grid-template-columns: repeat(3, 1fr); }
       .reports-row.cols-2 { grid-template-columns: repeat(2, 1fr); }
       .reports-row.cols-1 { grid-template-columns: 1fr; }
+      /* Horizontal scroll row for health reports */
+      .reports-row.cols-scroll { display: flex; flex-direction: row; overflow-x: auto; gap: 16px; padding-bottom: 10px; scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; scrollbar-width: thin; scrollbar-color: #dde2ea transparent; }
+      .reports-row.cols-scroll::-webkit-scrollbar { height: 4px; }
+      .reports-row.cols-scroll::-webkit-scrollbar-track { background: transparent; }
+      .reports-row.cols-scroll::-webkit-scrollbar-thumb { background: #dde2ea; border-radius: 4px; }
+      .reports-row.cols-scroll .rcard { min-width: 268px; max-width: 268px; flex-shrink: 0; scroll-snap-align: start; }
       .rcard { background: #fff; border-radius: 14px; border: 0.5px solid #e2e6ea; overflow: hidden; display: flex; flex-direction: column; transition: box-shadow 0.22s ease, transform 0.22s ease; }
       .rcard:hover { box-shadow: 0 10px 32px rgba(37,99,235,0.13); transform: translateY(-3px); }
       .rcard-banner { padding: 20px 20px 16px; display: flex; flex-direction: column; gap: 10px; min-height: 106px; position: relative; overflow: hidden; }
@@ -510,12 +516,47 @@
       .rcard-banner.teal  { background: linear-gradient(135deg, #0f2e26 0%, #1a5c46 100%); }
       .rcard-banner-icon { width: 34px; height: 34px; border-radius: 9px; background: rgba(255,255,255,0.15); display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
       .rcard-banner-title { font-size: 14px; font-weight: 600; color: #fff; line-height: 1.4; }
-      .rcard-body { padding: 14px 18px 16px; flex: 1; display: flex; flex-direction: column; gap: 3px; }
+      .rcard-score-row { display: flex; gap: 6px; align-items: center; }
+      .rcard-score-pill { font-size: 11px; font-weight: 600; padding: 2px 9px; border-radius: 20px; background: rgba(255,255,255,0.18); color: #fff; }
+      .rcard-body { padding: 14px 18px 16px; flex: 1; display: flex; flex-direction: column; gap: 6px; }
       .rcard-meta { font-size: 11px; color: #6b7a8d; }
-      .rcard-pages { font-size: 11px; color: #aab0bc; }
-      .rcard-btn { margin-top: auto; padding-top: 12px; }
+      .rcard-summary { font-size: 12px; color: #4a5568; line-height: 1.55; margin-top: 2px; }
+      .rcard-dims { display: flex; gap: 5px; flex-wrap: wrap; margin-top: 4px; }
+      .rcard-dim { font-size: 10px; font-weight: 600; padding: 2px 7px; border-radius: 4px; background: #f4f5f7; color: #6b7a8d; }
+      .rcard-btn { margin-top: auto; padding-top: 10px; }
       .rcard-btn button { width: 100%; padding: 9px; border: 1.5px solid #e2e6ea; border-radius: 8px; font-size: 13px; font-weight: 600; color: #1a2332; background: #fff; cursor: pointer; transition: background 0.15s, border-color 0.15s, color 0.15s; }
       .rcard-btn button:hover { background: #eff6ff; border-color: #2563eb; color: #2563eb; }
+      .rcard-btn button.active-btn { background: #0f1e3c; border-color: #0f1e3c; color: #fff; }
+      .rcard-btn button.active-btn:hover { background: #1a2e50; }
+
+      /* ── Report Modal ── */
+      .report-modal-overlay { display: none; position: fixed; inset: 0; background: rgba(8,14,28,0.55); z-index: 3000; align-items: center; justify-content: center; backdrop-filter: blur(3px); }
+      .report-modal-overlay.open { display: flex; }
+      .report-modal { background: #fff; border-radius: 18px; width: 680px; max-width: calc(100vw - 40px); max-height: 88vh; overflow-y: auto; box-shadow: 0 24px 64px rgba(8,14,28,0.28); display: flex; flex-direction: column; }
+      .rmodal-header { background: linear-gradient(135deg, #1e3a6e 0%, #2563eb 100%); padding: 28px 32px 24px; border-radius: 18px 18px 0 0; position: relative; }
+      .rmodal-close { position: absolute; top: 16px; right: 16px; width: 32px; height: 32px; border-radius: 50%; background: rgba(255,255,255,0.15); border: none; color: #fff; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 16px; transition: background 0.15s; }
+      .rmodal-close:hover { background: rgba(255,255,255,0.25); }
+      .rmodal-tag { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; color: rgba(255,255,255,0.6); text-transform: uppercase; margin-bottom: 8px; }
+      .rmodal-title { font-size: 20px; font-weight: 700; color: #fff; line-height: 1.3; margin-bottom: 12px; }
+      .rmodal-meta-row { display: flex; gap: 16px; align-items: center; }
+      .rmodal-meta-item { font-size: 12px; color: rgba(255,255,255,0.65); display: flex; align-items: center; gap: 5px; }
+      .rmodal-score-badge { background: rgba(255,255,255,0.2); color: #fff; font-size: 12px; font-weight: 700; padding: 4px 12px; border-radius: 20px; }
+      .rmodal-body { padding: 28px 32px; display: flex; flex-direction: column; gap: 24px; }
+      .rmodal-section-title { font-size: 11px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: #a0aab8; margin-bottom: 10px; }
+      .rmodal-text { font-size: 13.5px; color: #3d4f66; line-height: 1.7; }
+      .rmodal-dim-grid { display: grid; grid-template-columns: repeat(4,1fr); gap: 10px; }
+      .rmodal-dim-card { border: 1px solid #eaecf0; border-radius: 10px; padding: 12px 14px; }
+      .rmodal-dim-name { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #a0aab8; margin-bottom: 4px; }
+      .rmodal-dim-score { font-size: 20px; font-weight: 700; color: #0f1e3c; }
+      .rmodal-dim-note { font-size: 11px; color: #6b7a8d; margin-top: 2px; line-height: 1.4; }
+      .rmodal-findings { display: flex; flex-direction: column; gap: 10px; }
+      .rmodal-finding { display: flex; gap: 10px; align-items: flex-start; }
+      .rmodal-finding-dot { width: 6px; height: 6px; border-radius: 50%; background: #2563eb; flex-shrink: 0; margin-top: 6px; }
+      .rmodal-finding-text { font-size: 13px; color: #3d4f66; line-height: 1.6; }
+      .rmodal-next-steps { display: flex; flex-direction: column; gap: 8px; }
+      .rmodal-step { display: flex; gap: 10px; align-items: flex-start; padding: 10px 14px; background: #f8f9fc; border-radius: 8px; }
+      .rmodal-step-num { font-size: 11px; font-weight: 700; color: #2563eb; min-width: 18px; }
+      .rmodal-step-text { font-size: 13px; color: #3d4f66; line-height: 1.55; }
 
       @media (max-width: 767px) {
         .mobile-menu-toggle { display: inline-flex !important; }
@@ -1074,61 +1115,85 @@
               <div class="reports-section-header">
                 <span class="reports-section-label">HEALTH REPORTS</span>
                 <div class="reports-section-line"></div>
-                <span class="reports-section-count">4 documents</span>
+                <span class="reports-section-count">5 documents · scroll →</span>
               </div>
-              <div class="reports-row cols-2">
+              <div class="reports-row cols-scroll">
+
+                <!-- Apr 2026 — Latest, clickable -->
                 <div class="rcard">
                   <div class="rcard-banner blue">
-                    <div class="rcard-banner-icon">
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
-                    </div>
+                    <div class="rcard-banner-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
+                    <div class="rcard-banner-title">April 2026 Health Report</div>
+                    <div class="rcard-score-row"><span class="rcard-score-pill">29/100</span><span class="rcard-score-pill">Developing</span></div>
+                  </div>
+                  <div class="rcard-body">
+                    <div class="rcard-meta">Generated by Aria · Apr 16, 2026 · Latest</div>
+                    <div class="rcard-summary">CDO search entering final rounds. Strategy holding at A2 — People remains the primary blocker at A1.</div>
+                    <div class="rcard-dims"><span class="rcard-dim">Strategy A2</span><span class="rcard-dim">People A1</span><span class="rcard-dim">Process A2</span><span class="rcard-dim">Tech A2</span></div>
+                    <div class="rcard-btn"><button class="active-btn" onclick="openReport('apr2026')">View Report →</button></div>
+                  </div>
+                </div>
+
+                <!-- Mar 2026 — clickable -->
+                <div class="rcard">
+                  <div class="rcard-banner blue">
+                    <div class="rcard-banner-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
                     <div class="rcard-banner-title">March 2026 Health Report</div>
+                    <div class="rcard-score-row"><span class="rcard-score-pill">27/100</span><span class="rcard-score-pill">Developing</span></div>
                   </div>
                   <div class="rcard-body">
-                    <div class="rcard-meta">Generated by Aria · April 1, 2026</div>
-                    <div class="rcard-pages">4 pages · Overall score: 27/100</div>
-                    <div class="rcard-btn"><button>View Report →</button></div>
+                    <div class="rcard-meta">Generated by Aria · Apr 1, 2026</div>
+                    <div class="rcard-summary">Post-close assessment. Marginal improvement driven by Strategy. No CDO in place continues to limit capability growth.</div>
+                    <div class="rcard-dims"><span class="rcard-dim">Strategy A2</span><span class="rcard-dim">People A1</span><span class="rcard-dim">Process A2</span><span class="rcard-dim">Tech A2</span></div>
+                    <div class="rcard-btn"><button onclick="openReport('mar2026')">View Report →</button></div>
                   </div>
                 </div>
+
+                <!-- Feb 2026 — Engagement Close -->
                 <div class="rcard">
                   <div class="rcard-banner blue">
-                    <div class="rcard-banner-icon">
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
-                    </div>
-                    <div class="rcard-banner-title">February 2026 Health Report <span style="font-size:11px;opacity:0.7;font-weight:400;">· Engagement Close</span></div>
+                    <div class="rcard-banner-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
+                    <div class="rcard-banner-title">February 2026 Health Report <span style="font-size:10px;opacity:0.65;font-weight:400;">· Engagement Close</span></div>
+                    <div class="rcard-score-row"><span class="rcard-score-pill">25/100</span></div>
                   </div>
                   <div class="rcard-body">
-                    <div class="rcard-meta">Generated by Aria · March 1, 2026</div>
-                    <div class="rcard-pages">4 pages · Overall score: 25/100</div>
+                    <div class="rcard-meta">Generated by Aria · Mar 1, 2026</div>
+                    <div class="rcard-summary">Engagement close report. All dimensions held at A2. CDO hire identified as critical path item for Q2 2026.</div>
+                    <div class="rcard-dims"><span class="rcard-dim">Strategy A2</span><span class="rcard-dim">People A1</span><span class="rcard-dim">Process A2</span><span class="rcard-dim">Tech A2</span></div>
                     <div class="rcard-btn"><button>View Report →</button></div>
                   </div>
                 </div>
+
+                <!-- Jun 2025 — Mid-Engagement -->
                 <div class="rcard">
                   <div class="rcard-banner blue">
-                    <div class="rcard-banner-icon">
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
-                    </div>
-                    <div class="rcard-banner-title">June 2025 Health Report <span style="font-size:11px;opacity:0.7;font-weight:400;">· Mid-Engagement</span></div>
+                    <div class="rcard-banner-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
+                    <div class="rcard-banner-title">June 2025 Health Report <span style="font-size:10px;opacity:0.65;font-weight:400;">· Mid-Engagement</span></div>
+                    <div class="rcard-score-row"><span class="rcard-score-pill">25/100</span></div>
                   </div>
                   <div class="rcard-body">
-                    <div class="rcard-meta">Generated by Aria · July 1, 2025</div>
-                    <div class="rcard-pages">4 pages · Overall score: 25/100</div>
+                    <div class="rcard-meta">Generated by Aria · Jul 1, 2025</div>
+                    <div class="rcard-summary">OEM timeline clarity gap identified. Board briefing on competitive threat recommended before Q3 planning cycle.</div>
+                    <div class="rcard-dims"><span class="rcard-dim">Strategy A2</span><span class="rcard-dim">People A1</span><span class="rcard-dim">Process A2</span><span class="rcard-dim">Tech A2</span></div>
                     <div class="rcard-btn"><button>View Report →</button></div>
                   </div>
                 </div>
+
+                <!-- Oct 2024 — Baseline -->
                 <div class="rcard">
                   <div class="rcard-banner blue">
-                    <div class="rcard-banner-icon">
-                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg>
-                    </div>
-                    <div class="rcard-banner-title">Oct 2024 Health Report <span style="font-size:11px;opacity:0.7;font-weight:400;">· Baseline</span></div>
+                    <div class="rcard-banner-icon"><svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/></svg></div>
+                    <div class="rcard-banner-title">October 2024 Health Report <span style="font-size:10px;opacity:0.65;font-weight:400;">· Baseline</span></div>
+                    <div class="rcard-score-row"><span class="rcard-score-pill">23/100</span><span class="rcard-score-pill">Early Stage</span></div>
                   </div>
                   <div class="rcard-body">
-                    <div class="rcard-meta">Generated by Aria · Oct 2024</div>
-                    <div class="rcard-pages">4 pages · Overall score: 25/100</div>
+                    <div class="rcard-meta">Generated by Aria · Oct 15, 2024</div>
+                    <div class="rcard-summary">Baseline assessment. Connected vehicle readiness significantly below industry benchmark. Engagement scope defined.</div>
+                    <div class="rcard-dims"><span class="rcard-dim">Strategy A2</span><span class="rcard-dim">People A1</span><span class="rcard-dim">Process A1</span><span class="rcard-dim">Tech A1</span></div>
                     <div class="rcard-btn"><button>View Report →</button></div>
                   </div>
                 </div>
+
               </div>
             </div>
 
@@ -1174,7 +1239,7 @@
               <div class="reports-section-header">
                 <span class="reports-section-label">STAKEHOLDER COMMS</span>
                 <div class="reports-section-line"></div>
-                <span class="reports-section-count">1 document</span>
+                <span class="reports-section-count">2 documents</span>
               </div>
               <div class="reports-row cols-3">
                 <div class="rcard">
@@ -1186,7 +1251,20 @@
                   </div>
                   <div class="rcard-body">
                     <div class="rcard-meta">Generated by Aria · March 15, 2026</div>
-                    <div class="rcard-pages">2 pages · $12M investment brief</div>
+                    <div class="rcard-summary">ROI brief covering the $3.2M Phase 1 data infrastructure spend. Positions investment against OEM readiness risk and lost revenue exposure.</div>
+                    <div class="rcard-btn"><button>View Report →</button></div>
+                  </div>
+                </div>
+                <div class="rcard">
+                  <div class="rcard-banner teal">
+                    <div class="rcard-banner-icon">
+                      <svg width="18" height="18" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)"><path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 14.094A5.973 5.973 0 004 17v1H1v-1a3 3 0 013.75-2.906z"/></svg>
+                    </div>
+                    <div class="rcard-banner-title">Board Member Briefing — OEM Competitive Threat</div>
+                  </div>
+                  <div class="rcard-body">
+                    <div class="rcard-meta">Generated by Aria · April 8, 2026</div>
+                    <div class="rcard-summary">Targeted briefing for two uninformed board members. Outlines the 2026–2027 OEM digital requirements shift and Meridian's current readiness gap.</div>
                     <div class="rcard-btn"><button>View Report →</button></div>
                   </div>
                 </div>
@@ -1487,5 +1565,101 @@
   });
 </script>
     <script type="module" src="/app.js"></script>
+
+  <!-- ── Report Modals ── -->
+  <div class="report-modal-overlay" id="report-modal-overlay" onclick="closeReport(event)">
+    <div class="report-modal" id="report-modal-content"></div>
+  </div>
+
+  <script>
+  const REPORTS = {
+    apr2026: {
+      tag: 'Health Report · April 2026',
+      title: 'April 2026 Momentum Health Report',
+      date: 'April 16, 2026', pages: '5 pages', score: '29 / 100 — Developing',
+      summary: 'Meridian Automotive shows early signs of momentum as the CDO search enters its final candidate rounds. The Strategy dimension has stabilised at A2 following the executive alignment work completed in late 2024, but People remains the primary capability blocker at A1. Overall trajectory is positive — a confirmed CDO hire in Q2 is expected to unlock meaningful score movement across all dimensions within 60 days of onboarding.',
+      dims: [
+        { name: 'Strategy', score: 'A2', note: 'Exec aligned on 2–3 yr roadmap' },
+        { name: 'People', score: 'A1', note: 'CDO role still unfilled' },
+        { name: 'Process', score: 'A2', note: 'Governance framework in place' },
+        { name: 'Technology', score: 'A2', note: 'Phase 1 infra scoped, not funded' },
+      ],
+      findings: [
+        'CDO final-round interviews underway — hire expected by end of May 2026. This is the single highest-leverage action available.',
+        'CFO has not yet signed off on the $3.2M Phase 1 data infrastructure budget. Investment case requires board-level reinforcement.',
+        'OEM partner Stellantis has signalled readiness to begin pilot discussions pending Meridian reaching A3 in Technology.',
+        'Two board members remain uninformed on the competitive timeline risk from OEM digital requirements shifting to 2026–2027.',
+      ],
+      steps: [
+        'Close CDO hire — accelerate final-round decision to avoid Q2 delay.',
+        'Schedule CFO working session with Aria-generated investment ROI brief before next board vote.',
+        'Brief remaining board members using the OEM Competitive Threat memo (see Stakeholder Comms).',
+      ]
+    },
+    mar2026: {
+      tag: 'Health Report · March 2026',
+      title: 'March 2026 Momentum Health Report',
+      date: 'April 1, 2026', pages: '4 pages', score: '27 / 100 — Developing',
+      summary: 'Post-close assessment following the February engagement wrap. Marginal score improvement of +2 points is driven primarily by continued strategy work and improved process documentation. The absence of a CDO remains the dominant constraint — without this hire, no dimension can realistically advance beyond A2. The CDO search was formally opened in March and is progressing through the screening phase.',
+      dims: [
+        { name: 'Strategy', score: 'A2', note: 'Stable, roadmap documented' },
+        { name: 'People', score: 'A1', note: 'CDO search opened March 2026' },
+        { name: 'Process', score: 'A2', note: 'Minor improvement in governance' },
+        { name: 'Technology', score: 'A2', note: 'No new infrastructure spend' },
+      ],
+      findings: [
+        'Score improved by 2 points month-over-month, the first positive movement since the October 2024 baseline.',
+        'CDO job spec finalised and posted. Three executive search firms engaged. Expected shortlist within 6 weeks.',
+        'Data infrastructure Phase 1 proposal ($3.2M) is awaiting CFO sign-off — currently scheduled for May board agenda.',
+        'Process dimension improvement driven by new data governance working group launched in February.',
+      ],
+      steps: [
+        'Accelerate CDO screening — push for first-round interviews to begin within 3 weeks.',
+        'Prepare CFO briefing pack for May board meeting — focus on OEM readiness risk and ROI case.',
+        'Maintain momentum on data governance working group as a demonstration of organisational commitment.',
+      ]
+    }
+  };
+
+  function openReport(id) {
+    const r = REPORTS[id];
+    if (!r) return;
+    const dimsHtml = r.dims.map(d => `
+      <div class="rmodal-dim-card">
+        <div class="rmodal-dim-name">${d.name}</div>
+        <div class="rmodal-dim-score">${d.score}</div>
+        <div class="rmodal-dim-note">${d.note}</div>
+      </div>`).join('');
+    const findingsHtml = r.findings.map(f => `
+      <div class="rmodal-finding"><div class="rmodal-finding-dot"></div><div class="rmodal-finding-text">${f}</div></div>`).join('');
+    const stepsHtml = r.steps.map((s, i) => `
+      <div class="rmodal-step"><div class="rmodal-step-num">${i+1}.</div><div class="rmodal-step-text">${s}</div></div>`).join('');
+    document.getElementById('report-modal-content').innerHTML = `
+      <div class="rmodal-header">
+        <button class="rmodal-close" onclick="closeReport()">✕</button>
+        <div class="rmodal-tag">${r.tag}</div>
+        <div class="rmodal-title">${r.title}</div>
+        <div class="rmodal-meta-row">
+          <span class="rmodal-meta-item">${r.date}</span>
+          <span class="rmodal-meta-item">${r.pages}</span>
+          <span class="rmodal-score-badge">${r.score}</span>
+        </div>
+      </div>
+      <div class="rmodal-body">
+        <div><div class="rmodal-section-title">Executive Summary</div><div class="rmodal-text">${r.summary}</div></div>
+        <div><div class="rmodal-section-title">Dimension Scores</div><div class="rmodal-dim-grid">${dimsHtml}</div></div>
+        <div><div class="rmodal-section-title">Key Findings</div><div class="rmodal-findings">${findingsHtml}</div></div>
+        <div><div class="rmodal-section-title">Recommended Next Steps</div><div class="rmodal-next-steps">${stepsHtml}</div></div>
+      </div>`;
+    document.getElementById('report-modal-overlay').classList.add('open');
+    document.body.style.overflow = 'hidden';
+  }
+
+  function closeReport(e) {
+    if (e && e.target !== document.getElementById('report-modal-overlay')) return;
+    document.getElementById('report-modal-overlay').classList.remove('open');
+    document.body.style.overflow = '';
+  }
+  </script>
   </body>
 </html>
