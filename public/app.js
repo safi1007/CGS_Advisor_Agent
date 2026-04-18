@@ -10,6 +10,9 @@ const SESSION_OPENER_TEXT =
   "CDO Hired & Onboarded is still the milestone that will determine whether the rest of Meridian's roadmap moves on time. What feels most at risk right now?";
 const MONTHLY_PROGRESS_REPORT_PROMPT = "Generate my monthly progress report";
 const REPORT_STORAGE_KEY = "lastReportMonth";
+const LAST_CHECKIN_DATE = "2026-03-26";
+const LAST_SESSION_DATE = "2026-04-16";
+const LAST_GENERATED_REPORT_DATE = "2026-04-01";
 
 const messagesEl = document.getElementById("messages");
 const formEl = document.getElementById("chat-form");
@@ -31,6 +34,10 @@ const dashboardReportBannerLinkEl = document.getElementById(
 const dashboardReportBannerCloseEl = document.getElementById(
   "dashboard-report-banner-close"
 );
+const dashboardLastCheckinEl = document.getElementById("dashboard-last-checkin");
+const dashboardLastReportEl = document.getElementById("dashboard-last-report");
+const dashboardLastSessionEl = document.getElementById("dashboard-last-session");
+const healthLastCheckinEl = document.getElementById("health-last-checkin");
 
 const conversationHistory = [];
 let conversationState = null;
@@ -38,6 +45,10 @@ let stateContext = null;
 let thinkingMessageEl = null;
 let activeRequestController = null;
 let isRequestInFlight = false;
+
+// Document sidebar state — set when Aria returns a document response
+let currentDocumentText = null;
+let currentDocumentTitle = null;
 
 // Aria avatar SVG — single source of truth for the avatar appearance.
 // Change width/height only; never touch the defs, gradients, or path data.
@@ -66,6 +77,51 @@ const stopIcon = `
     <rect x="5.5" y="5.5" width="9" height="9" rx="1.5"></rect>
   </svg>
 `;
+
+const downloadButtonIcon = `
+  <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
+    <path d="M10 3v8" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M6.5 8.5 10 12l3.5-3.5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    <path d="M4 15h12" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" fill="none"/>
+  </svg>
+`;
+
+const docTypeIcons = {
+  health: `
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)" aria-hidden="true" focusable="false">
+      <path d="M2 11a1 1 0 011-1h2a1 1 0 011 1v5a1 1 0 01-1 1H3a1 1 0 01-1-1v-5zm6-4a1 1 0 011-1h2a1 1 0 011 1v9a1 1 0 01-1 1H9a1 1 0 01-1-1V7zm6-3a1 1 0 011-1h2a1 1 0 011 1v12a1 1 0 01-1 1h-2a1 1 0 01-1-1V4z"/>
+    </svg>
+  `,
+  briefing: `
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)" aria-hidden="true" focusable="false">
+      <path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>
+    </svg>
+  `,
+  stakeholder: `
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)" aria-hidden="true" focusable="false">
+      <path d="M13 6a3 3 0 11-6 0 3 3 0 016 0zM18 8a2 2 0 11-4 0 2 2 0 014 0zM14 15a4 4 0 00-8 0v1h8v-1zM6 8a2 2 0 11-4 0 2 2 0 014 0zM16 18v-1a5.972 5.972 0 00-.75-2.906A3.005 3.005 0 0119 15v1h-3zM4.75 14.094A5.973 5.973 0 004 17v1H1v-1a3 3 0 013.75-2.906z"/>
+    </svg>
+  `,
+  message: `
+    <svg width="16" height="16" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)" aria-hidden="true" focusable="false">
+      <path d="M2.003 5.884L10 9.882l7.997-3.998A2 2 0 0016 4H4a2 2 0 00-1.997 1.884zM18 8.118l-8 4-8-4V14a2 2 0 002 2h12a2 2 0 002-2V8.118z"/>
+    </svg>
+  `,
+};
+
+function getDocTypeIcon(type) {
+  return docTypeIcons[type] || docTypeIcons.briefing;
+}
+
+function setDocPreviewMeta(config) {
+  // HTML uses class names, not IDs — use querySelector with class selectors
+  const iconEl = document.querySelector(".doc-sidebar-icon");
+  const titleEl = document.querySelector(".doc-sidebar-title");
+  const metaEl = document.querySelector(".doc-sidebar-meta-text");
+  if (iconEl) iconEl.innerHTML = getDocTypeIcon(config.type);
+  if (titleEl) titleEl.textContent = config.title;
+  if (metaEl) metaEl.textContent = config.meta;
+}
 
 const reportDueTodayIcon = `
   <svg viewBox="0 0 20 20" aria-hidden="true" focusable="false">
@@ -162,6 +218,65 @@ function formatMonthDayYear(date) {
     day: "numeric",
     year: "numeric",
   });
+}
+
+function formatMonthYear(date) {
+  return date.toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+  });
+}
+
+function parseLocalDate(value) {
+  const [year, month, day] = value.split("-").map(Number);
+  return new Date(year, month - 1, day);
+}
+
+function daysSince(dateValue) {
+  const now = new Date();
+  const target = parseLocalDate(dateValue);
+  const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const compare = new Date(
+    target.getFullYear(),
+    target.getMonth(),
+    target.getDate()
+  );
+  return Math.max(
+    0,
+    Math.round((today.getTime() - compare.getTime()) / (24 * 60 * 60 * 1000))
+  );
+}
+
+function buildLatestReportLabel(currentMonthKey, reportGeneratedThisMonth) {
+  if (reportGeneratedThisMonth) {
+    const [year, month] = currentMonthKey.split("-").map(Number);
+    return `${formatMonthYear(new Date(year, month - 1, 1))} Progress Report`;
+  }
+
+  return `${formatMonthYear(parseLocalDate(LAST_GENERATED_REPORT_DATE))} Progress Report`;
+}
+
+function updateDashboardActivity() {
+  const now = new Date();
+  const currentMonthKey = getCurrentReportMonth(now);
+  const lastReportMonth = localStorage.getItem(REPORT_STORAGE_KEY);
+  const reportGeneratedThisMonth = lastReportMonth === currentMonthKey;
+
+  const lastCheckinText = `${daysSince(LAST_CHECKIN_DATE)} day${
+    daysSince(LAST_CHECKIN_DATE) === 1 ? "" : "s"
+  } ago`;
+  const lastSessionText = `${daysSince(LAST_SESSION_DATE)} day${
+    daysSince(LAST_SESSION_DATE) === 1 ? "" : "s"
+  } ago`;
+  const lastReportText = buildLatestReportLabel(
+    currentMonthKey,
+    reportGeneratedThisMonth
+  );
+
+  if (dashboardLastCheckinEl) dashboardLastCheckinEl.textContent = lastCheckinText;
+  if (healthLastCheckinEl) healthLastCheckinEl.textContent = lastCheckinText;
+  if (dashboardLastSessionEl) dashboardLastSessionEl.textContent = lastSessionText;
+  if (dashboardLastReportEl) dashboardLastReportEl.textContent = lastReportText;
 }
 
 function updateMonthlyProgressReportUI() {
@@ -430,6 +545,153 @@ function setBusyState(isBusy) {
   );
 }
 
+// ── Document detection & sidebar population ──────────────────────────────────
+
+const DOC_CAPABILITY_TITLES = {
+  meeting_briefing:   'Board Meeting Briefing',
+  progress_report:    'Monthly Progress Report',
+  stakeholder_comms:  'Stakeholder Communication Plan',
+  health_report:      'Transformation Health Report',
+};
+
+const DOC_CAPABILITY_ICON_TYPES = {
+  meeting_briefing:  'briefing',
+  progress_report:   'health',
+  stakeholder_comms: 'stakeholder',
+  health_report:     'health',
+};
+
+// SVG paths and labels for capability badge pills — mirrors the Knowledge Base
+// capability bar exactly (same icons, same label wording, same stroke style).
+const CAPABILITY_BADGE_CONFIG = {
+  meeting_briefing: {
+    label: 'Board Meeting Preparation',
+    paths: '<path d="M6 4.5h8A1.5 1.5 0 0 1 15.5 6v9A1.5 1.5 0 0 1 14 16.5H6A1.5 1.5 0 0 1 4.5 15V6A1.5 1.5 0 0 1 6 4.5Z"/><path d="M7 2.5V6"/><path d="M13 2.5V6"/><path d="M4.5 8.5h11"/><path d="M7.5 11.5h2"/><path d="M11.5 11.5h1"/>',
+  },
+  progress_report: {
+    label: 'Progress Report',
+    paths: '<path d="M6 2.5h6l4 4V16a1.5 1.5 0 0 1-1.5 1.5h-8A1.5 1.5 0 0 1 5 16V4A1.5 1.5 0 0 1 6.5 2.5Z"/><path d="M12 2.5V7h4"/><path d="M8 11h4"/><path d="M8 14h5"/>',
+  },
+  stakeholder_comms: {
+    label: 'Stakeholder Communication',
+    paths: '<path d="M7.5 10.5a2.5 2.5 0 1 0 0-5 2.5 2.5 0 0 0 0 5Z"/><path d="M12.5 9.5a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/><path d="M3.5 15.5a4 4 0 0 1 8 0"/><path d="M11.5 15.5a3.3 3.3 0 0 1 5 0"/>',
+  },
+  health_report: {
+    label: 'Health Check-in',
+    paths: '<path d="M4 16V9"/><path d="M9 16V5"/><path d="M14 16v-7"/><path d="M3 16.5h13"/>',
+  },
+};
+
+// Builds a .capability-badge element for the given capability key.
+// Returns null if the key is not recognised.
+function buildCapabilityBadge(capabilityKey) {
+  const config = CAPABILITY_BADGE_CONFIG[capabilityKey];
+  if (!config) return null;
+  const el = document.createElement('div');
+  el.className = 'capability-badge';
+  el.innerHTML =
+    '<svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor"' +
+    ' stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"' +
+    ' aria-hidden="true" style="flex-shrink:0;">' +
+    config.paths +
+    '</svg>' +
+    config.label;
+  return el;
+}
+
+// Returns { title, iconType, capabilityKey } if the API response contains a document, else null.
+function detectDocument(data) {
+  const cap = data.capabilityTriggered;
+  if (cap && DOC_CAPABILITY_TITLES[cap]) {
+    return { title: DOC_CAPABILITY_TITLES[cap], iconType: DOC_CAPABILITY_ICON_TYPES[cap], capabilityKey: cap };
+  }
+  const reply = data.reply || '';
+  if (reply.length > 800 && /^#/m.test(reply)) {
+    return { title: 'Aria Document', iconType: 'briefing', capabilityKey: null };
+  }
+  return null;
+}
+
+// Extracts the prose before the first # heading (max 200 chars).
+function extractDocIntro(text) {
+  const lines = text.split('\n');
+  const introLines = [];
+  for (const line of lines) {
+    if (/^#{1,3}\s/.test(line.trim())) break;
+    if (line.trim()) introLines.push(line.trim());
+  }
+  const intro = introLines.join(' ').trim();
+  if (!intro) return 'Your document is ready — see the panel on the right.';
+  return intro.length > 200 ? intro.slice(0, 200).trimEnd() + '\u2026' : intro;
+}
+
+// Stores state, updates sidebar header + body, and renders the chat chip row.
+function showDocumentInChat(reply, docInfo) {
+  currentDocumentText = reply;
+  currentDocumentTitle = docInfo.title;
+
+  // Update sidebar header
+  const today = new Date();
+  const formattedDate = today.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' });
+  setDocPreviewMeta({
+    type: docInfo.iconType,
+    title: docInfo.title,
+    meta: 'Generated by Aria \u00b7 ' + formattedDate,
+  });
+
+  // Populate sidebar body with rendered markdown
+  const bodyEl = document.querySelector('.doc-sidebar-body');
+  if (bodyEl) bodyEl.innerHTML = renderMarkdown(reply);
+
+  // Build chat message row: short intro + doc chip
+  const row = document.createElement('article');
+  row.className = 'message-row agent';
+
+  const avatarEl = document.createElement('div');
+  avatarEl.className = 'message-avatar agent';
+  avatarEl.innerHTML = ariaAvatarSVG(CHAT_MESSAGE_AVATAR_SIZE);
+
+  const bodyMsgEl = document.createElement('div');
+  bodyMsgEl.className = 'message-body';
+
+  // Capability badge above the message bubble
+  const badgeEl = buildCapabilityBadge(docInfo.capabilityKey);
+  if (badgeEl) bodyMsgEl.appendChild(badgeEl);
+
+  const bubbleEl = document.createElement('article');
+  bubbleEl.className = 'message agent';
+  bubbleEl.textContent = extractDocIntro(reply);
+
+  const chipEl = document.createElement('div');
+  chipEl.className = 'doc-chip';
+  chipEl.setAttribute('role', 'button');
+  chipEl.setAttribute('tabindex', '0');
+  chipEl.setAttribute('aria-label', docInfo.title + ' \u2014 click to preview');
+  chipEl.innerHTML =
+    '<div class="doc-chip-icon">' + getDocTypeIcon(docInfo.iconType) + '</div>' +
+    '<span class="doc-chip-name">' + escapeHtml(docInfo.title) + '</span>' +
+    '<button class="doc-chip-dl" type="button">' + downloadButtonIcon + '<span>PDF</span></button>';
+
+  chipEl.addEventListener('click', function (e) {
+    if (e.target.closest('.doc-chip-dl')) {
+      e.stopPropagation();
+      downloadDocContent();
+    } else {
+      openDocSidebar();
+    }
+  });
+  chipEl.addEventListener('keydown', function (e) {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDocSidebar(); }
+  });
+
+  bodyMsgEl.appendChild(bubbleEl);
+  bodyMsgEl.appendChild(chipEl);
+  row.appendChild(avatarEl);
+  row.appendChild(bodyMsgEl);
+  messagesEl.appendChild(row);
+  scrollMessagesToBottom();
+}
+
 async function sendMessage(content) {
   conversationHistory.push({ role: "user", content });
   addMessage("user", content);
@@ -462,7 +724,13 @@ async function sendMessage(content) {
     stateContext = data.stateContext ?? null;
     hideThinkingIndicator();
     conversationHistory.push({ role: "assistant", content: data.reply });
-    addMessage("agent", data.reply);
+
+    const docInfo = detectDocument(data);
+    if (docInfo) {
+      showDocumentInChat(data.reply, docInfo);
+    } else {
+      addMessage("agent", data.reply);
+    }
 
     if (
       content.trim().toLowerCase() ===
@@ -470,9 +738,15 @@ async function sendMessage(content) {
     ) {
       localStorage.setItem(REPORT_STORAGE_KEY, getCurrentReportMonth());
       updateMonthlyProgressReportUI();
+      updateDashboardActivity();
     }
 
-    checkEscalation(data);
+    if (detectEscalation(data)) {
+      showEscalationBanner();
+      const allAriaBodies = document.querySelectorAll(".message-row.agent .message-body");
+      const lastAriaBody = allAriaBodies[allAriaBodies.length - 1];
+      if (lastAriaBody) appendEscalationChips(lastAriaBody);
+    }
   } catch (error) {
     hideThinkingIndicator();
 
@@ -557,6 +831,7 @@ setBusyState(false);
 applyHealthScoreContent();
 renderStaticAriaAvatars();
 updateMonthlyProgressReportUI();
+updateDashboardActivity();
 
 dashboardReportButtonEl?.addEventListener("click", () => {
   triggerMonthlyProgressReportFlow();
@@ -712,30 +987,89 @@ const ESCALATION_PHRASES = [
   "beyond what aria",
   "i want to flag",
   "this warrants",
+  "prepare a briefing for sarah",
+  "sarah should be directly involved",
+  "needs to be in the room",
   "prepare a briefing",
 ];
 
 let escalationShown = false;
 let escalationDismissed = false;
 
-function checkEscalation(data) {
-  if (escalationShown || escalationDismissed) return;
-
+function detectEscalation(data) {
   const replyLower = (data.reply || "").toLowerCase();
-  const triggeredByPhrase = ESCALATION_PHRASES.some((p) => replyLower.includes(p));
-  const triggeredByFlag = data.escalationDetected === true;
+  return (
+    data.escalationDetected === true ||
+    ESCALATION_PHRASES.some((p) => replyLower.includes(p))
+  );
+}
 
-  if (!triggeredByPhrase && !triggeredByFlag) return;
-
+function showEscalationBanner() {
+  if (escalationShown || escalationDismissed) return;
   const banner = document.getElementById("escalation-banner");
   if (!banner) return;
-
   escalationShown = true;
   banner.style.display = "flex";
   banner.style.animation = "none";
-  // Force reflow so re-adding animation plays from scratch
   void banner.offsetWidth;
   banner.style.animation = "slideDown 0.3s ease";
+}
+
+function appendEscalationChips(messageContainer) {
+  const contactBtn = document.getElementById("escalation-contact-btn");
+
+  const chipsEl = document.createElement("div");
+  chipsEl.className = "escalation-reply-chips";
+
+  // Filled button — Send briefing
+  const sendBtn = document.createElement("button");
+  sendBtn.type = "button";
+  sendBtn.className = "escalation-reply-chip filled";
+  sendBtn.style.cssText = "display:inline-flex;align-items:center;gap:6px;";
+  sendBtn.innerHTML =
+    '<svg width="12" height="12" viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" style="flex-shrink:0;">' +
+      '<path d="M17 3L2 9.5l5.5 2L10 17l2-4 5-10Z"/>' +
+      '<path d="M7.5 11.5l3.5-3"/>' +
+    "</svg>" +
+    "<span>Send briefing to Sarah</span>";
+  sendBtn.addEventListener("click", function () {
+    chipsEl.remove();
+    addMessage(
+      "agent",
+      "Done \u2014 I have sent Sarah a full briefing with the incident history and my recommended intervention. She will typically respond within one business day. In the meantime, here is what I would suggest you do today:\n- Avoid escalating directly before Sarah has had a chance to review\n- Document this incident with specifics, date, and impact"
+    );
+    if (contactBtn) {
+      contactBtn.textContent = "\u2713 Briefing sent to Sarah";
+      contactBtn.style.color = "#2e7d52";
+      contactBtn.style.border = "none";
+      contactBtn.style.background = "transparent";
+      contactBtn.style.cursor = "default";
+      contactBtn.disabled = true;
+    }
+    window.location.href =
+      `mailto:sarah.chen@cgsadvisors.com` +
+      `?subject=CGS%20Momentum%20Escalation%20%E2%80%94%20Meridian%20Automotive` +
+      `&body=Hi%20Sarah%2C%0A%0AAria%20has%20flagged%20a%20situation%20in%20my%20CGS%20Momentum%20session%20that%20may%20need%20your%20direct%20involvement.%0A%0AClient%3A%20James%20Whitfield%2C%20Meridian%20Automotive%0ADate%3A%20${encodeURIComponent(new Date().toLocaleDateString())}%0A%0APlease%20review%20when%20you%20have%20a%20moment.%0A%0AJames`;
+  });
+
+  // Outlined button — Not yet
+  const notYetBtn = document.createElement("button");
+  notYetBtn.type = "button";
+  notYetBtn.className = "escalation-reply-chip outlined";
+  notYetBtn.textContent = "Not yet, tell me more";
+  notYetBtn.addEventListener("click", function () {
+    chipsEl.remove();
+    sendMessage("Not yet, tell me more");
+  });
+
+  chipsEl.appendChild(sendBtn);
+  chipsEl.appendChild(notYetBtn);
+  messageContainer.appendChild(chipsEl);
+}
+
+// Legacy wrapper kept for any internal callers
+function checkEscalation(data) {
+  if (detectEscalation(data)) showEscalationBanner();
 }
 
 (function initEscalationBanner() {
@@ -880,104 +1214,24 @@ function closeDocSidebar() {
 }
 
 function downloadDocContent() {
-  var lines = [
-    'BOARD BRIEFING: DIGITAL TRANSFORMATION PROGRESS',
-    'Meridian Automotive Group · April 2026 · CONFIDENTIAL',
-    '',
-    'EXECUTIVE SUMMARY',
-    'Meridian Automotive Group has made measured but deliberate progress across its digital',
-    'transformation agenda since programme inception in October 2024. With sixteen months of',
-    'engagement now complete, the overall maturity score sits at 29/100 — placing the',
-    'organisation in the Developing band — with clear upward momentum as the CDO hire',
-    'approaches final decision.',
-    '',
-    'The primary lever for accelerated improvement remains the People dimension, which',
-    'continues to hold at A1 due to the absence of senior digital leadership. A confirmed CDO',
-    'appointment in Q2 2026 is expected to unlock meaningful score movement across all four',
-    'dimensions within 60 days of onboarding.',
-    '',
-    'TRANSFORMATION STATUS',
-    'Dimension   | Score | Status',
-    '------------|-------|------------------',
-    'Strategy    | A2    | Stable',
-    'People      | A1    | Critical blocker',
-    'Process     | A2    | Stable',
-    'Technology  | A2    | Stable',
-    '',
-    'TOP THREE RISKS',
-    '1. CDO hire delay — final-round decision must close by end of April 2026 to preserve',
-    '   Q2 momentum targets.',
-    '2. OEM integration timeline — external dependency on Tier 1 partner roadmap creates a',
-    '   six-week uncertainty window for the data infrastructure build-out.',
-    '3. Board alignment gap — two board members remain uncommitted on the Phase 2 investment',
-    '   case; a briefing and Q&A session is recommended before the June planning cycle.',
-    '',
-    'DECISIONS REQUIRED',
-    '1. Approve CDO final-round candidates and confirm offer authority with the CEO and CHRO',
-    '   before the end of Q2.',
-    '',
-    '---',
-    'Prepared with intelligence support from CGS Momentum / Aria',
-  ];
-  var blob = new Blob([lines.join('\n')], { type: 'text/plain' });
+  if (!currentDocumentText) return;
+  var blob = new Blob([currentDocumentText], { type: 'text/plain' });
   var url = URL.createObjectURL(blob);
   var a = document.createElement('a');
   a.href = url;
-  a.download = 'Q2_2026_Board_Briefing.txt';
+  a.download = currentDocumentTitle + '.txt';
   document.body.appendChild(a);
   a.click();
   document.body.removeChild(a);
   URL.revokeObjectURL(url);
 }
 
-// Mock doc delivery message — injected after the session opener
-(function addMockDocMessage() {
-  var row = document.createElement('article');
-  row.className = 'message-row agent';
-
-  var avatarEl = document.createElement('div');
-  avatarEl.className = 'message-avatar agent';
-  avatarEl.innerHTML = ariaAvatarSVG(CHAT_MESSAGE_AVATAR_SIZE);
-
-  var bodyEl = document.createElement('div');
-  bodyEl.className = 'message-body';
-
-  var bubbleEl = document.createElement('article');
-  bubbleEl.className = 'message agent';
-  bubbleEl.textContent = 'Your board briefing is ready. I have covered your milestone status, the top three risks for Northlake, and the two decisions you need from this meeting.';
-
-  var chipEl = document.createElement('div');
-  chipEl.className = 'doc-chip';
-  chipEl.setAttribute('role', 'button');
-  chipEl.setAttribute('tabindex', '0');
-  chipEl.setAttribute('aria-label', 'Q2 2026 Board Briefing — click to preview');
-  chipEl.innerHTML =
-    '<div class="doc-chip-icon">' +
-      '<svg width="11" height="11" viewBox="0 0 20 20" fill="rgba(255,255,255,0.9)">' +
-        '<path fill-rule="evenodd" d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" clip-rule="evenodd"/>' +
-      '</svg>' +
-    '</div>' +
-    '<span class="doc-chip-name">Q2 2026 Board Briefing</span>' +
-    '<button class="doc-chip-dl" type="button">↓ PDF</button>';
-
-  chipEl.addEventListener('click', function(e) {
-    if (e.target.classList.contains('doc-chip-dl')) {
-      e.stopPropagation();
-      downloadDocContent();
-    } else {
-      openDocSidebar();
-    }
-  });
-  chipEl.addEventListener('keydown', function(e) {
-    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openDocSidebar(); }
-  });
-
-  bodyEl.appendChild(bubbleEl);
-  bodyEl.appendChild(chipEl);
-  row.appendChild(avatarEl);
-  row.appendChild(bodyEl);
-  messagesEl.appendChild(row);
-})();
+// Expose functions used by HTML onclick attributes.
+// app.js is loaded as type="module" so top-level declarations are module-scoped
+// and not accessible from inline event handlers unless explicitly assigned to window.
+window.openDocSidebar     = openDocSidebar;
+window.closeDocSidebar    = closeDocSidebar;
+window.downloadDocContent = downloadDocContent;
 
 // ── Initial sync — run once DOM is fully read ────────────────────────────────
 // Any future HTML edit (new rcard, new intg-card, etc.) is automatically
