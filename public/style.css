@@ -628,8 +628,17 @@
 }
 
 .health-score-segment-active {
-  background: rgba(15, 30, 60, 0.05);
-  border: 1px solid rgba(15, 30, 60, 0.12);
+  background:
+    linear-gradient(180deg, rgba(255,255,255,0.82) 0%, rgba(255,255,255,0.56) 100%),
+    rgba(230,236,245,0.42);
+  border: 1px solid rgba(201,212,228,0.88);
+  box-shadow:
+    inset 0 1px 0 rgba(255,255,255,0.9),
+    inset 0 -1px 0 rgba(15,30,60,0.08),
+    0 10px 22px rgba(15,30,60,0.12),
+    0 2px 6px rgba(15,30,60,0.08);
+  backdrop-filter: blur(16px);
+  -webkit-backdrop-filter: blur(16px);
 }
 
 .health-score-segment-copy {
@@ -792,6 +801,26 @@
   width: 1px;
   align-self: stretch;
   background: rgba(15, 30, 60, 0.06);
+}
+
+.maturity-level-a1 .maturity-level-code {
+  color: #93c5fd;
+}
+
+.maturity-level-a2 .maturity-level-code {
+  color: #60a5fa;
+}
+
+.maturity-level-a3 .maturity-level-code {
+  color: #3b82f6;
+}
+
+.maturity-level-a4 .maturity-level-code {
+  color: #2563eb;
+}
+
+.maturity-level-a5 .maturity-level-code {
+  color: #0f1e3c;
 }
 
 @keyframes donutDraw {
