@@ -242,57 +242,546 @@
       #health-score-card { background: rgba(255,253,250,0.78); box-shadow: 0 6px 28px rgba(59,130,246,0.10), 0 1px 0 rgba(255,255,255,0.9) inset; padding: 24px; display: flex; flex-direction: column; }
       #health-dim-card   { background: rgba(248,251,255,0.82); box-shadow: 0 6px 28px rgba(59,130,246,0.10), 0 1px 0 rgba(255,255,255,0.9) inset; padding: 24px; }
 
-      .project-banner { border-radius: 14px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 20px rgba(15,30,60,0.12); }
-      .project-banner-hero { background: #0f1e3c; padding: 24px 28px 20px; }
-      .project-banner-top { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 10px; }
-      .project-title { font-size: 22px; font-weight: 600; color: #fff; display: flex; align-items: center; gap: 10px; }
+      /* ── Mission Control Banner ── */
+      .project-banner { border-radius: 14px; overflow: hidden; margin-bottom: 20px; box-shadow: 0 4px 24px rgba(15,30,60,0.15); }
+      .project-banner-hero {
+        background: linear-gradient(135deg, #0a1628 0%, #0f1e3c 55%, #1a2e52 100%);
+        padding: 24px 28px;
+        display: flex; align-items: center; gap: 24px;
+      }
+      /* Left: title + meta + aria line */
+      .mc-left { flex: 1; min-width: 0; }
+      .project-title { font-size: 20px; font-weight: 700; color: #fff; display: flex; align-items: center; gap: 10px; line-height: 1.25; }
       .project-title-icon { width: 36px; height: 36px; border-radius: 8px; background: rgba(255,255,255,0.1); display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: rgba(255,255,255,0.85); }
-      .project-meta { font-size: 12px; color: rgba(255,255,255,0.45); margin-top: 4px; padding-left: 46px; }
-      .badge-completed { background: rgba(255,255,255,0.12); color: #fff; font-size: 11px; padding: 4px 12px; border-radius: 20px; font-weight: 500; border: 1px solid rgba(255,255,255,0.2); }
-      .project-banner-stats { background: #fff; padding: 20px 28px; display: flex; gap: 40px; border-top: none; }
-      .stat-label { font-size: 10px; color: #a0aab8; letter-spacing: 1px; margin-bottom: 6px; }
-      .stat-value { font-size: 14px; font-weight: 600; color: #0f1e3c; line-height: 1.4; }
+      .project-meta { font-size: 11.5px; color: rgba(255,255,255,0.4); margin-top: 5px; padding-left: 46px; }
+      .mc-aria-line {
+        display: flex; align-items: center; gap: 9px;
+        margin-top: 14px; margin-left: 46px;
+        padding: 9px 14px; border-radius: 9px;
+        background: rgba(255,255,255,0.06);
+        border: 1px solid rgba(255,255,255,0.09);
+        font-size: 12px; color: rgba(255,255,255,0.78); font-weight: 500;
+        max-width: 480px;
+      }
+      .mc-aria-dot {
+        width: 7px; height: 7px; border-radius: 50%;
+        background: #4ade80; flex-shrink: 0;
+        box-shadow: 0 0 6px rgba(74,222,128,0.6);
+        animation: mcAriaPulse 2.4s ease-in-out infinite;
+      }
+      @keyframes mcAriaPulse {
+        0%, 100% { opacity: 1; box-shadow: 0 0 6px rgba(74,222,128,0.6); }
+        50%       { opacity: 0.5; box-shadow: 0 0 2px rgba(74,222,128,0.2); }
+      }
+      /* Right: metrics strip */
+      .mc-right { display: flex; align-items: stretch; flex-shrink: 0; border-left: 1px solid rgba(255,255,255,0.08); }
+      .mc-stat {
+        display: flex; flex-direction: column; align-items: center; justify-content: center;
+        padding: 8px 24px; border-right: 1px solid rgba(255,255,255,0.08);
+        text-align: center; gap: 4px;
+      }
+      .mc-stat:last-child { border-right: none; }
+      .mc-stat-label { font-size: 9px; font-weight: 700; letter-spacing: 1.2px; text-transform: uppercase; color: rgba(255,255,255,0.32); white-space: nowrap; }
+      /* Health ring */
+      .mc-ring-wrap { position: relative; width: 52px; height: 52px; flex-shrink: 0; }
+      .mc-ring-wrap svg { width: 52px; height: 52px; transform: rotate(-90deg); display: block; }
+      .mc-ring-track { fill: none; stroke: rgba(255,255,255,0.1); stroke-width: 4; }
+      .mc-ring-fill  { fill: none; stroke: #4ade80; stroke-width: 4; stroke-linecap: round;
+                       stroke-dasharray: 27.33 66.92; stroke-dashoffset: 23.56;
+                       transition: stroke-dasharray 1.2s ease; }
+      .mc-ring-center { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; }
+      .mc-ring-num { font-size: 14px; font-weight: 800; color: #fff; line-height: 1; }
+      .mc-ring-denom { font-size: 8px; color: rgba(255,255,255,0.38); line-height: 1; margin-top: 1px; }
+      /* Countdown */
+      .mc-countdown-num { font-size: 34px; font-weight: 800; color: #fff; line-height: 1; letter-spacing: -1px; }
+      .mc-countdown-num.urgent { color: #fbbf24; }
+      .mc-countdown-unit { font-size: 10px; color: rgba(255,255,255,0.45); font-weight: 500; margin-top: 1px; }
+      /* Phase */
+      .mc-phase-num { font-size: 28px; font-weight: 800; color: #fff; line-height: 1; }
+      .mc-phase-of { font-size: 13px; color: rgba(255,255,255,0.4); font-weight: 500; }
+      /* White stats strip */
+      .project-banner-stats { background: #fff; padding: 16px 28px; display: flex; gap: 0; border-top: none; }
+      .banner-stat-item { flex: 1; padding: 0 20px 0 0; }
+      .banner-stat-item + .banner-stat-item { padding-left: 20px; border-left: 1px solid #f0f2f6; }
+      .stat-label { font-size: 9.5px; color: #a0aab8; letter-spacing: 1px; text-transform: uppercase; margin-bottom: 5px; font-weight: 600; }
+      .stat-value { font-size: 13px; font-weight: 600; color: #0f1e3c; line-height: 1.4; }
+      /* ── Severity Spectrum ── */
+      .severity-spectrum {
+        background: #fff; border: 1px solid #eaecf0;
+        border-radius: 12px; padding: 20px 24px 18px;
+        margin-bottom: 16px;
+        box-shadow: 0 1px 4px rgba(15,30,60,0.04);
+      }
+      .spec-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 28px; }
+      .spec-header-left { display: flex; align-items: center; gap: 8px; }
+      .spec-header-icon { width: 20px; height: 20px; border-radius: 5px; background: #f8f5ff; display: flex; align-items: center; justify-content: center; color: #7c3aed; flex-shrink: 0; }
+      .spec-header-title { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #6b7a8d; }
+      .spec-cgs-tag { font-size: 9.5px; font-weight: 600; color: #7c3aed; background: #f5f3ff; padding: 3px 9px; border-radius: 4px; letter-spacing: 0.3px; border: 1px solid rgba(124,58,237,0.12); }
+
+      /* Track: fixed-height container that holds the bar + floating markers */
+      /* Track: fixed height, bar anchored from bottom so dot math is simple */
+      .spec-track-wrap { position: relative; height: 90px; }
+
+      /* Gradient bar — sits behind the marker dots */
+      .spec-bar {
+        position: absolute;
+        left: 0; right: 0;
+        bottom: 22px; height: 5px;
+        border-radius: 3px;
+        z-index: 1; /* markers sit above this */
+        background: linear-gradient(to right,
+          #dc2626 0%,
+          #ea580c 20%,
+          #f59e0b 38%,
+          #84cc16 54%,
+          #e2e6ea 66%,
+          #e2e6ea 100%);
+      }
+
+      /* Tick labels sit just below the bar */
+      .spec-ticks {
+        position: absolute; bottom: 4px; left: 0; right: 0;
+        display: flex; justify-content: space-between;
+      }
+      .spec-tick-label {
+        font-size: 9px; font-weight: 600; letter-spacing: 0.5px;
+        text-transform: uppercase; color: #c4c9d4;
+        transform: translateX(-50%);
+      }
+      .spec-tick-label:first-child { transform: translateX(0); }
+      .spec-tick-label:last-child  { transform: translateX(-100%); }
+
+      /* Markers: full-height column, labels pushed to bottom; dot is absolutely
+         placed so its center locks exactly onto the bar center.
+         bar: bottom:22px, height:5px → center at bottom:24.5px
+         dot:  height:18px (border-box) → bottom edge at 24.5-9=15.5px ✓          */
+      .spec-marker {
+        position: absolute;
+        top: 0; bottom: 0;
+        left: 0;
+        transform: translateX(-50%);
+        display: flex; flex-direction: column;
+        align-items: center; justify-content: flex-end;
+        /* push label stack above dot: dot top at 33.5px + 6px gap = 40px */
+        padding-bottom: 40px;
+        gap: 4px;
+        z-index: 2; /* above .spec-bar */
+        opacity: 0;
+        transition: left 1s cubic-bezier(0.4,0,0.2,1), opacity 0.4s ease;
+        pointer-events: none;
+        white-space: nowrap;
+      }
+
+      .spec-marker-name { font-size: 12px; font-weight: 700; color: #0f1e3c; }
+      .spec-marker-tag {
+        font-size: 9px; font-weight: 700; letter-spacing: 0.5px; text-transform: uppercase;
+        padding: 2px 6px; border-radius: 4px;
+      }
+      .spec-marker-tag.crit { background: #fef2f2; color: #dc2626; }
+      .spec-marker-tag.high { background: #fff7ed; color: #ea580c; }
+      .spec-marker-tag.med  { background: #f0fdf4; color: #16a34a; }
+
+      /* Dot — absolutely placed so its center sits exactly on the bar center.
+         bottom: 15.5px → dot center = 15.5 + 9 = 24.5px = bar center ✓
+         White ring is a box-shadow so it floats above the bar (never clipped). */
+      .spec-dot-wrap {
+        position: absolute;
+        bottom: 15.5px;
+        left: 50%;
+        transform: translateX(-50%);
+        display: flex; align-items: center; justify-content: center;
+        z-index: 3; /* explicitly above both bar (z:1) and marker (z:2) */
+      }
+      .spec-dot-pip {
+        width: 18px; height: 18px; border-radius: 50%;
+        box-sizing: border-box;
+        border: none; /* ring done via box-shadow so it can't be clipped */
+        flex-shrink: 0;
+        position: relative;
+      }
+      /* Colored fill + white halo ring + subtle colored glow */
+      .spec-marker.m-capability .spec-dot-pip {
+        background: #dc2626;
+        box-shadow: 0 0 0 3.5px #fff, 0 2px 12px rgba(220,38,38,0.38);
+      }
+      .spec-marker.m-clarity .spec-dot-pip {
+        background: #ea580c;
+        box-shadow: 0 0 0 3.5px #fff, 0 2px 12px rgba(234,88,12,0.38);
+      }
+      .spec-marker.m-conviction .spec-dot-pip {
+        background: #16a34a;
+        box-shadow: 0 0 0 3.5px #fff, 0 2px 12px rgba(22,163,74,0.38);
+      }
+
+      /* Pulse ring — centered on 18px dot: (32-18)/2 = 7px offset each side */
+      .spec-pulse {
+        position: absolute;
+        top: -7px; left: -7px;
+        width: 32px; height: 32px; border-radius: 50%;
+        border: 1.5px solid currentColor;
+        opacity: 0;
+        animation: specPulse 2.4s ease-in-out infinite;
+      }
+      .spec-marker.m-capability .spec-pulse { color: #dc2626; animation-delay: 0s; }
+      .spec-marker.m-clarity    .spec-pulse { color: #ea580c; animation-delay: 0.5s; }
+      .spec-marker.m-conviction .spec-pulse { color: #16a34a; animation-delay: 1s; }
+      @keyframes specPulse {
+        0%   { transform: scale(0.8); opacity: 0.65; }
+        70%  { transform: scale(1.7); opacity: 0; }
+        100% { opacity: 0; }
+      }
+
       /* ── Gap Cards ── */
-      .gap-cards { display: grid; grid-template-columns: repeat(3,1fr); gap: 16px; margin-bottom: 28px; }
-      .gap-card { border-radius: 12px; background: #fff; border: 1px solid #eaecf0; box-shadow: 0 1px 4px rgba(15,30,60,0.04); display: flex; flex-direction: column; }
-      .gap-card-header { padding: 18px 20px 14px; border-bottom: 1px solid #f4f5f7; }
-      .gap-card-titles { display: flex; flex-direction: column; gap: 6px; }
-      /* Severity labels */
-      .gap-severity { font-size: 10px; font-weight: 600; letter-spacing: 1px; text-transform: uppercase; }
-      .gap-card.red-card    .gap-severity { color: #b91c1c; }
-      .gap-card.yellow-card .gap-severity { color: #92400e; }
-      .gap-card.green-card  .gap-severity { color: #166534; }
+      /* Frosted section tray so the glass cards catch the light */
+      .gap-cards {
+        display: grid; grid-template-columns: repeat(3,1fr); gap: 14px;
+        margin-bottom: 28px;
+        background: linear-gradient(145deg, rgba(241,245,255,0.7) 0%, rgba(235,242,255,0.5) 100%);
+        border-radius: 20px;
+        padding: 18px;
+        border: 1px solid rgba(15,30,60,0.05);
+      }
+
+      /* Glass card */
+      .gap-card {
+        border-radius: 14px;
+        background: rgba(255,255,255,0.78);
+        backdrop-filter: blur(20px) saturate(160%);
+        -webkit-backdrop-filter: blur(20px) saturate(160%);
+        border: 1px solid rgba(255,255,255,0.72);
+        box-shadow:
+          0 1px 2px rgba(15,30,60,0.04),
+          0 4px 20px rgba(15,30,60,0.05),
+          inset 0 1.5px 0 rgba(255,255,255,0.95);
+        display: flex; flex-direction: column;
+        transition: transform 0.18s ease, box-shadow 0.18s ease, background 0.18s ease;
+        /* no colored left border */
+      }
+      .gap-card:hover {
+        transform: translateY(-2px);
+        background: rgba(255,255,255,0.92);
+        box-shadow:
+          0 2px 6px rgba(15,30,60,0.06),
+          0 10px 32px rgba(15,30,60,0.08),
+          inset 0 1.5px 0 rgba(255,255,255,0.98);
+      }
+
+      .gap-card-header { padding: 18px 20px 13px; border-bottom: 1px solid rgba(15,30,60,0.05); }
+      .gap-card-titles { display: flex; flex-direction: column; gap: 7px; }
+
+      /* Severity — tiny muted dot + all-caps label, no strong color */
+      .gap-severity {
+        font-size: 10px; font-weight: 600; letter-spacing: 0.7px; text-transform: uppercase;
+        color: #9aa5b4;
+        display: inline-flex; align-items: center; gap: 6px;
+      }
+      .gap-severity::before {
+        content: ''; flex-shrink: 0;
+        width: 6px; height: 6px; border-radius: 50%;
+      }
+      /* Dot tints — very pastel, not harsh */
+      .gap-card.red-card    .gap-severity::before { background: #fca5a5; }
+      .gap-card.orange-card .gap-severity::before { background: #fdba74; }
+      .gap-card.green-card  .gap-severity::before { background: #86efac; }
+
       .gap-gap-title { font-size: 15px; font-weight: 700; color: #0f1e3c; font-family: "Inter", sans-serif; line-height: 1.35; }
-      .gap-body { padding: 18px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
+      .gap-body { padding: 16px 20px; display: flex; flex-direction: column; gap: 14px; flex: 1; }
       .gap-summary { font-size: 13px; font-weight: 500; color: #4a5568; line-height: 1.6; }
       .gap-row { display: flex; gap: 8px; align-items: flex-start; }
       .gap-row-label { font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase; color: #b0b8c4; white-space: nowrap; padding-top: 2px; min-width: 48px; }
       .gap-row-text { font-size: 12.5px; color: #6b7a8d; line-height: 1.6; }
-      /* Buttons */
-      .gap-card-footer { padding: 12px 20px 18px; display: flex; gap: 8px; }
-      .gap-cta { font-size: 11px; font-weight: 600; padding: 7px 15px; border-radius: 8px; cursor: pointer; transition: background 0.15s, box-shadow 0.15s; letter-spacing: 0.2px; display: inline-flex; align-items: center; gap: 5px; }
-      .gap-cta-primary { background: #fff; color: #2563eb; border: 1.5px solid #2563eb; }
-      .gap-cta-primary:hover { background: #eff6ff; }
-      .gap-cta-secondary { background: #fff; color: #6b7a8d; border: 1.5px solid #e4e6ea; }
-      .gap-cta-secondary:hover { background: #f8f9fa; }
+
+      /* Buttons — minimal, ghost style */
+      .gap-card-footer { padding: 10px 20px 16px; display: flex; gap: 8px; }
+      .gap-cta {
+        font-size: 11px; font-weight: 600; padding: 6px 14px; border-radius: 8px;
+        cursor: pointer; letter-spacing: 0.2px; display: inline-flex; align-items: center; gap: 5px;
+        transition: background 0.15s ease, border-color 0.15s ease, color 0.15s ease;
+      }
+      .gap-cta-primary {
+        background: rgba(37,99,235,0.07); color: #2563eb;
+        border: 1px solid rgba(37,99,235,0.22);
+      }
+      .gap-cta-primary:hover { background: rgba(37,99,235,0.13); border-color: rgba(37,99,235,0.35); }
+      .gap-cta-secondary {
+        background: rgba(15,30,60,0.04); color: #7a8799;
+        border: 1px solid rgba(15,30,60,0.1);
+      }
+      .gap-cta-secondary:hover { background: rgba(15,30,60,0.07); }
+      .gap-cta-secondary.generating { color: #2563eb; border-color: rgba(37,99,235,0.3); background: rgba(37,99,235,0.05); cursor: default; }
+      .gap-cta-secondary.done-state { color: #166534; border-color: rgba(22,163,74,0.25); background: rgba(22,163,74,0.06); }
+
+      /* Gap plan expansion area */
+      .gap-plan-area {
+        overflow: hidden;
+        max-height: 0;
+        transition: max-height 0.55s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease;
+        opacity: 0;
+        border-top: 0px solid rgba(15,30,60,0.06);
+      }
+      .gap-plan-area.open { max-height: 600px; opacity: 1; border-top-width: 1px; }
+      .gap-plan-inner { padding: 16px 20px 20px; }
+      .gap-plan-header {
+        display: flex; align-items: center; gap: 7px;
+        font-size: 10px; font-weight: 700; letter-spacing: 0.8px; text-transform: uppercase;
+        color: #2563eb; margin-bottom: 16px;
+      }
+      .gap-plan-header-dot {
+        width: 18px; height: 18px; border-radius: 50%;
+        background: rgba(37,99,235,0.1); display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0;
+      }
+      .gap-plan-step { display: flex; gap: 12px; margin-bottom: 14px; }
+      .gap-plan-step:last-child { margin-bottom: 0; }
+      .gap-plan-step-num {
+        width: 20px; height: 20px; border-radius: 50%;
+        background: rgba(15,30,60,0.08); color: #0f1e3c;
+        font-size: 10px; font-weight: 700;
+        display: flex; align-items: center; justify-content: center;
+        flex-shrink: 0; margin-top: 1px;
+      }
+      .gap-plan-step-body { flex: 1; }
+      .gap-plan-step-title { font-size: 12.5px; font-weight: 700; color: #0f1e3c; margin-bottom: 3px; }
+      .gap-plan-step-desc { font-size: 12px; color: #4a5568; line-height: 1.65; }
+
+      /* Spinner */
+      .gap-spin {
+        width: 11px; height: 11px; border: 2px solid rgba(37,99,235,0.2);
+        border-top-color: #2563eb; border-radius: 50%;
+        animation: spinRot 0.7s linear infinite; flex-shrink: 0;
+      }
+      @keyframes spinRot { to { transform: rotate(360deg); } }
 
       /* ── Transformation Roadmap ── */
-      .roadmap-label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 22px; }
+      .roadmap-label-row { display: flex; align-items: center; gap: 8px; margin-bottom: 28px; }
       .roadmap-label-icon { width: 22px; height: 22px; border-radius: 5px; background: #eff6ff; display: flex; align-items: center; justify-content: center; flex-shrink: 0; color: #2563eb; }
       .roadmap-label-text { font-size: 10px; font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; color: #6b7a8d; }
       .roadmap-card { background: #fff; border-radius: 12px; padding: 26px 30px; border: 1px solid #eaecf0; }
-      .tl-item { display: flex; align-items: flex-start; gap: 16px; padding-bottom: 26px; position: relative; }
-      .tl-item:last-child { padding-bottom: 0; }
-      .tl-line { position: absolute; left: 14px; top: 30px; bottom: 0; width: 1px; background: #eaecf0; }
-      .tl-item:last-child .tl-line { display: none; }
-      .tl-dot { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 600; flex-shrink: 0; z-index: 1; }
-      .tl-dot.done    { background: #dcfce7; color: #16a34a; }
-      .tl-dot.done svg { fill: #16a34a; }
-      .tl-dot.inprog  { background: #dbeafe; color: #2563eb; }
-      .tl-dot.inprog svg { fill: #2563eb; }
-      .tl-dot.pending { background: #f4f5f7; color: #9aa3af; border: 1px solid #e4e6ea; }
-      .tl-title { font-size: 14px; font-weight: 500; color: #1a2332; line-height: 1.4; }
-      .tl-date { font-size: 12px; color: #9aa3af; margin-top: 4px; }
+
+      /* ── Living Vertical Timeline ── */
+      .vtl-wrap { position: relative; }
+      /* Animated axis line */
+      .vtl-axis {
+        position: absolute;
+        left: 110px; /* date(80px) + gap(16px) + half-dot(14px) = 110px center */
+        top: 14px;
+        width: 2px;
+        border-radius: 2px;
+        background: linear-gradient(to bottom,
+          #16a34a 0%, #16a34a 30%,
+          #2563eb 32%, #2563eb 47%,
+          #e2e6ea 49%, #e2e6ea 100%);
+        height: 0;
+        animation: vtlDraw 1.6s cubic-bezier(0.4, 0, 0.2, 1) 0.15s forwards;
+      }
+      @keyframes vtlDraw { to { height: calc(100% - 28px); } }
+
+      .vtl-item {
+        display: grid;
+        grid-template-columns: 80px 28px 1fr;
+        column-gap: 16px;
+        align-items: flex-start;
+        padding-bottom: 34px;
+        opacity: 0;
+        animation: vtlFadeUp 0.5s ease forwards;
+      }
+      .vtl-item:last-child { padding-bottom: 0; }
+      @keyframes vtlFadeUp {
+        from { opacity: 0; transform: translateY(12px); }
+        to   { opacity: 1; transform: translateY(0); }
+      }
+      .vtl-item:nth-child(1) { animation-delay: 0.25s; }
+      .vtl-item:nth-child(2) { animation-delay: 0.48s; }
+      .vtl-item:nth-child(3) { animation-delay: 0.68s; }
+      .vtl-item:nth-child(4) { animation-delay: 0.86s; }
+      .vtl-item:nth-child(5) { animation-delay: 1.02s; }
+      .vtl-item:nth-child(6) { animation-delay: 1.16s; }
+
+      /* Date column */
+      .vtl-left { text-align: right; padding-top: 5px; }
+      .vtl-date { font-size: 11px; font-weight: 600; color: #6b7a8d; white-space: nowrap; }
+      .vtl-pending .vtl-date { color: #c4c9d4; }
+
+      /* Dot column */
+      .vtl-dot-col { display: flex; justify-content: center; position: relative; z-index: 2; }
+      .vtl-dot-done {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: #16a34a;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 0 5px #dcfce7;
+      }
+      .vtl-dot-inprog {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: #2563eb;
+        display: flex; align-items: center; justify-content: center;
+        box-shadow: 0 0 0 5px rgba(37,99,235,0.14);
+        position: relative;
+      }
+      .vtl-pulse-ring {
+        position: absolute;
+        inset: -7px;
+        border-radius: 50%;
+        border: 2px solid #2563eb;
+        opacity: 0.7;
+        animation: vtlPulse 2.2s ease-in-out infinite;
+      }
+      @keyframes vtlPulse {
+        0%, 100% { transform: scale(1);    opacity: 0.7; }
+        60%       { transform: scale(1.5);  opacity: 0; }
+      }
+      .vtl-dot-pending {
+        width: 28px; height: 28px; border-radius: 50%;
+        background: #f8f9fa; border: 2px solid #e2e6ea;
+      }
+
+      /* Content column */
+      .vtl-content { padding-top: 2px; }
+      .vtl-tag {
+        display: inline-block;
+        font-size: 10px; font-weight: 700; letter-spacing: 0.7px; text-transform: uppercase;
+        color: #aab0bc; margin-bottom: 5px;
+      }
+      .vtl-tag.done  { color: #16a34a; }
+      .vtl-tag.inprog {
+        color: #2563eb; background: #eff6ff;
+        padding: 2px 9px; border-radius: 20px;
+        letter-spacing: 0.4px; font-size: 10px;
+      }
+      .vtl-title {
+        font-size: 15px; font-weight: 700; color: #0f1e3c;
+        line-height: 1.35; margin-bottom: 6px;
+      }
+      .vtl-desc {
+        font-size: 12px; color: #6b7a8d; line-height: 1.65; max-width: 440px;
+      }
+      .vtl-pending .vtl-title { color: #aab0bc; }
+      .vtl-pending .vtl-desc  { color: #c4c9d4; }
+
+      /* ── Score Split Comparison ── */
+      .score-split {
+        display: grid; grid-template-columns: 1fr auto 1fr;
+        align-items: stretch;
+        background: #fff; border: 1px solid #eaecf0;
+        border-radius: 12px; margin-bottom: 16px;
+        box-shadow: 0 1px 4px rgba(15,30,60,0.04);
+        overflow: hidden;
+      }
+      .score-col {
+        padding: 20px 24px 20px;
+        display: flex; flex-direction: column; gap: 10px;
+      }
+      .score-col.col-past  { background: #fafafa; }
+      .score-col.col-now   { background: #fff; }
+      .score-col-era {
+        display: flex; align-items: center; gap: 8px;
+      }
+      .score-era-dot {
+        width: 8px; height: 8px; border-radius: 50%; flex-shrink: 0;
+      }
+      .col-past  .score-era-dot { background: #d1d5db; }
+      .col-now   .score-era-dot { background: #2563eb;
+        box-shadow: 0 0 0 3px rgba(37,99,235,0.15);
+        animation: mcAriaPulse 2.4s ease-in-out infinite;
+      }
+      .score-era-label {
+        font-size: 10px; font-weight: 700; letter-spacing: 1.2px;
+        text-transform: uppercase;
+      }
+      .col-past .score-era-label { color: #9ca3af; }
+      .col-now  .score-era-label { color: #2563eb; }
+      .score-era-date {
+        font-size: 11px; font-weight: 500; margin-top: -4px;
+      }
+      .col-past .score-era-date { color: #c4c9d4; }
+      .col-now  .score-era-date  { color: #6b7a8d; }
+      /* Big score number */
+      .score-num-row { display: flex; align-items: baseline; gap: 6px; }
+      .score-big {
+        font-size: 48px; font-weight: 800; letter-spacing: -2px; line-height: 1;
+      }
+      .col-past .score-big { color: #d1d5db; }
+      .col-now  .score-big { color: #0f1e3c; }
+      .score-denom {
+        font-size: 14px; font-weight: 600; color: #c4c9d4; padding-bottom: 2px;
+      }
+      .score-delta {
+        display: inline-flex; align-items: center; gap: 4px;
+        font-size: 12px; font-weight: 700;
+        background: #f0fdf4; color: #16a34a;
+        border: 1px solid #bbf7d0;
+        padding: 3px 9px; border-radius: 20px;
+        margin-left: 2px; align-self: flex-end; margin-bottom: 6px;
+      }
+      /* Dimension pills */
+      .score-dims { display: flex; gap: 5px; flex-wrap: wrap; }
+      .score-dim {
+        font-size: 10px; font-weight: 600;
+        padding: 3px 8px; border-radius: 5px;
+      }
+      .col-past .score-dim { background: #f4f5f7; color: #9ca3af; }
+      .col-now  .score-dim { background: #eff6ff; color: #2563eb; }
+      .col-now  .score-dim.dim-lagging { background: #fef2f2; color: #b91c1c; }
+      /* Caption row */
+      .score-caption {
+        font-size: 11px; color: #9ca3af; font-style: italic; margin-top: 2px;
+      }
+      .col-now .score-caption { color: #6b7a8d; font-style: normal; font-weight: 500; }
+      /* Vertical divider */
+      .score-divider {
+        width: 1px; background: #f0f2f6; margin: 16px 0;
+        display: flex; align-items: center; justify-content: center; position: relative;
+      }
+      .score-divider-arrow {
+        position: absolute;
+        width: 26px; height: 26px; border-radius: 50%;
+        background: #fff; border: 1px solid #eaecf0;
+        display: flex; align-items: center; justify-content: center;
+        font-size: 12px; color: #16a34a; font-weight: 700;
+        box-shadow: 0 1px 4px rgba(15,30,60,0.06);
+      }
+
+      /* ── Ask Aria Shortcut Row ── */
+      .aria-shortcut-row {
+        display: flex; align-items: center; gap: 22px;
+        background: linear-gradient(135deg, #0a1628 0%, #0f1e3c 58%, #182f54 100%);
+        border-radius: 14px; padding: 22px 28px; margin-top: 20px;
+        box-shadow: 0 4px 24px rgba(15,30,60,0.18);
+      }
+      .aria-shortcut-orb-wrap {
+        position: relative; flex-shrink: 0;
+        width: 52px; height: 52px;
+      }
+      .aria-shortcut-orb-wrap::after {
+        content: ''; position: absolute; inset: -6px; border-radius: 50%;
+        background: radial-gradient(circle, rgba(37,99,235,0.25) 0%, transparent 70%);
+        pointer-events: none;
+      }
+      .aria-shortcut-divider {
+        width: 1px; align-self: stretch; flex-shrink: 0;
+        background: rgba(255,255,255,0.1); margin: 0 4px;
+      }
+      .aria-shortcut-content { flex: 1; min-width: 0; }
+      .aria-shortcut-label {
+        font-size: 13px; font-weight: 600; color: rgba(255,255,255,0.88);
+        margin-bottom: 12px; letter-spacing: -0.1px;
+      }
+      .aria-shortcut-chips { display: flex; gap: 8px; flex-wrap: wrap; }
+      .aria-chip {
+        font-size: 12px; font-weight: 500;
+        color: rgba(255,255,255,0.75);
+        background: rgba(255,255,255,0.07);
+        border: 1px solid rgba(255,255,255,0.14);
+        border-radius: 20px; padding: 7px 16px;
+        cursor: pointer; white-space: nowrap;
+        transition: background 0.15s, border-color 0.15s, color 0.15s, transform 0.12s;
+        display: inline-flex; align-items: center; gap: 6px;
+      }
+      .aria-chip::before { content: '›'; font-size: 14px; opacity: 0.5; }
+      .aria-chip:hover {
+        background: rgba(255,255,255,0.14); border-color: rgba(255,255,255,0.28);
+        color: #fff; transform: translateY(-1px);
+      }
+      .aria-chip:active { transform: translateY(0); }
 
       /* ── REPORTS PAGE ── */
       .reports-metrics-bar { display: flex; align-items: center; gap: 0; margin-bottom: 24px; }
@@ -487,10 +976,10 @@
       .page.active { animation: pageIn 0.38s cubic-bezier(0.22,1,0.36,1) both; }
 
       /* 2. Card hover lift */
-      .card, .settings-card, .roadmap-card, .gap-card, .dim-card {
+      .card, .settings-card, .roadmap-card, .dim-card {
         transition: all 0.2s ease;
       }
-      .card:hover, .settings-card:hover, .roadmap-card:hover, .gap-card:hover {
+      .card:hover, .settings-card:hover, .roadmap-card:hover {
         transform: translateY(-2px);
         box-shadow: 0 8px 32px rgba(15,30,60,0.12), 0 1px 0 rgba(255,255,255,0.8) inset;
       }
@@ -519,7 +1008,7 @@
       .dim-row:nth-child(3) .dim-bar { animation-delay: 0.25s; }
       .dim-row:nth-child(4) .dim-bar { animation-delay: 0.35s; }
 
-      /* 5. Roadmap & timeline items slide in from left */
+      /* 5. Dashboard roadmap items slide in from left */
       @keyframes slideInLeft {
         from { opacity: 0; transform: translateX(-14px); }
         to   { opacity: 1; transform: translateX(0); }
@@ -529,12 +1018,6 @@
       .roadmap-item:nth-child(2) { animation-delay: 0.15s; }
       .roadmap-item:nth-child(3) { animation-delay: 0.25s; }
       .roadmap-item:nth-child(4) { animation-delay: 0.35s; }
-      .tl-item { animation: slideInLeft 0.4s ease both; }
-      .tl-item:nth-child(1) { animation-delay: 0.05s; }
-      .tl-item:nth-child(2) { animation-delay: 0.15s; }
-      .tl-item:nth-child(3) { animation-delay: 0.25s; }
-      .tl-item:nth-child(4) { animation-delay: 0.35s; }
-      .tl-item:nth-child(5) { animation-delay: 0.45s; }
 
       /* 6. Button hover lift + smooth transitions */
       .qa-btn, .btn-orange, .save-btn, .contact-btn {
@@ -1409,27 +1892,177 @@
           <div class="page-body">
             <div class="project-banner">
               <div class="project-banner-hero">
-                <div class="project-banner-top">
-                  <div>
-                    <div class="project-title">
-                      <span class="project-title-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
-                      Connected Vehicle Strategy
-                    </div>
-                    <div class="project-meta">Meridian Automotive Group · Oct 2024 – Feb 2026 · Lead: Sarah Chen</div>
+
+                <!-- Left: title + meta + Aria status -->
+                <div class="mc-left">
+                  <div class="project-title">
+                    <span class="project-title-icon"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M22 19a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h5l2 3h9a2 2 0 0 1 2 2z"/></svg></span>
+                    Connected Vehicle Strategy Programme
                   </div>
-                  <span class="badge-completed">Completed</span>
+                  <div class="project-meta">Meridian Automotive Group &nbsp;·&nbsp; CGS Digital Advisory &nbsp;·&nbsp; Phase 1 Active</div>
+                  <div class="mc-aria-line">
+                    <span class="mc-aria-dot"></span>
+                    Transformation on track — 1 critical action required
+                  </div>
                 </div>
-              </div>
+
+                <!-- Right: health ring · countdown · phase -->
+                <div class="mc-right">
+
+                  <!-- Health Score Ring -->
+                  <div class="mc-stat">
+                    <div class="mc-ring-wrap">
+                      <svg viewBox="0 0 40 40">
+                        <circle class="mc-ring-track" cx="20" cy="20" r="15"/>
+                        <circle class="mc-ring-fill"  cx="20" cy="20" r="15"/>
+                      </svg>
+                      <div class="mc-ring-center">
+                        <span class="mc-ring-num">29</span>
+                        <span class="mc-ring-denom">/100</span>
+                      </div>
+                    </div>
+                    <div class="mc-stat-label">Health Score</div>
+                  </div>
+
+                  <!-- CDO Hire Countdown -->
+                  <div class="mc-stat">
+                    <div class="mc-countdown-num" id="mc-cdo-days">—</div>
+                    <div class="mc-countdown-unit">days</div>
+                    <div class="mc-stat-label">CDO Hire Deadline</div>
+                  </div>
+
+                  <!-- Engagement Phase -->
+                  <div class="mc-stat">
+                    <div class="mc-phase-num">1<span class="mc-phase-of">/3</span></div>
+                    <div class="mc-countdown-unit">Active</div>
+                    <div class="mc-stat-label">Engagement Phase</div>
+                  </div>
+
+                </div><!-- /mc-right -->
+              </div><!-- /hero -->
+
               <div class="project-banner-stats">
-                <div><div class="stat-label">ENGAGEMENT TYPE</div><div class="stat-value">Strategic Transformation</div></div>
-                <div><div class="stat-label">DURATION</div><div class="stat-value">16 months</div></div>
-                <div><div class="stat-label">FRAMEWORKS USED</div><div class="stat-value">5 CGS Frameworks</div></div>
-                <div><div class="stat-label">RECOMMENDATIONS</div><div class="stat-value">12 delivered</div></div>
+                <div class="banner-stat-item"><div class="stat-label">Engagement Type</div><div class="stat-value">Strategic Transformation</div></div>
+                <div class="banner-stat-item"><div class="stat-label">Duration</div><div class="stat-value"><span data-countup="16" data-suffix=" months active">0 months active</span></div></div>
+                <div class="banner-stat-item"><div class="stat-label">Frameworks Used</div><div class="stat-value"><span data-countup="5" data-suffix=" CGS Frameworks">0 CGS Frameworks</span></div></div>
+                <div class="banner-stat-item"><div class="stat-label">Recommendations</div><div class="stat-value"><span data-countup="12" data-suffix=" delivered">0 delivered</span></div></div>
               </div>
             </div>
+            <!-- TRANSFORMATION SCORE SPLIT -->
+            <div class="score-split">
+
+              <!-- Left: At Engagement Close -->
+              <div class="score-col col-past">
+                <div class="score-col-era">
+                  <span class="score-era-dot"></span>
+                  <span class="score-era-label">At Engagement Close</span>
+                </div>
+                <div class="score-era-date">Feb 2026</div>
+                <div class="score-num-row">
+                  <span class="score-big">25</span>
+                  <span class="score-denom">/100</span>
+                </div>
+                <div class="score-dims">
+                  <span class="score-dim">Strategy A2</span>
+                  <span class="score-dim">People A1</span>
+                  <span class="score-dim">Process A2</span>
+                  <span class="score-dim">Tech A2</span>
+                </div>
+                <div class="score-caption">Final CGS assessment · engagement concluded</div>
+              </div>
+
+              <!-- Divider with arrow -->
+              <div class="score-divider">
+                <div class="score-divider-arrow">↑</div>
+              </div>
+
+              <!-- Right: Today -->
+              <div class="score-col col-now">
+                <div class="score-col-era">
+                  <span class="score-era-dot"></span>
+                  <span class="score-era-label">Today</span>
+                </div>
+                <div class="score-era-date">Apr 2026 · Live</div>
+                <div class="score-num-row">
+                  <span class="score-big">29</span>
+                  <span class="score-denom">/100</span>
+                  <span class="score-delta">
+                    <svg width="9" height="9" viewBox="0 0 10 10" fill="currentColor"><path d="M5 1l4 8H1z"/></svg>
+                    +4 pts
+                  </span>
+                </div>
+                <div class="score-dims">
+                  <span class="score-dim">Strategy A2</span>
+                  <span class="score-dim dim-lagging">People A1</span>
+                  <span class="score-dim">Process A2</span>
+                  <span class="score-dim">Tech A2</span>
+                </div>
+                <div class="score-caption">Needle moved post-engagement · CDO hire pending</div>
+              </div>
+
+            </div><!-- /score-split -->
+
+            <!-- THREE Cs SEVERITY SPECTRUM -->
+            <div class="severity-spectrum">
+              <div class="spec-header">
+                <div class="spec-header-left">
+                  <span class="spec-header-icon">
+                    <svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M3 3a1 1 0 000 2h11a1 1 0 100-2H3zm0 4a1 1 0 000 2h7a1 1 0 100-2H3zm0 4a1 1 0 100 2h4a1 1 0 100-2H3z"/></svg>
+                  </span>
+                  <span class="spec-header-title">Three Cs Severity Spectrum</span>
+                </div>
+                <span class="spec-cgs-tag">CGS Framework</span>
+              </div>
+
+              <div class="spec-track-wrap" id="spec-track">
+
+                <!-- Marker: Capability (Critical) -->
+                <div class="spec-marker m-capability" data-pos="10%">
+                  <span class="spec-marker-name">Capability</span>
+                  <span class="spec-marker-tag crit">Critical</span>
+                  <div class="spec-dot-wrap">
+                    <span class="spec-pulse"></span>
+                    <div class="spec-dot-pip"></div>
+                  </div>
+                </div>
+
+                <!-- Marker: Clarity (High Severity) -->
+                <div class="spec-marker m-clarity" data-pos="29%">
+                  <span class="spec-marker-name">Clarity</span>
+                  <span class="spec-marker-tag high">High Severity</span>
+                  <div class="spec-dot-wrap">
+                    <span class="spec-pulse"></span>
+                    <div class="spec-dot-pip"></div>
+                  </div>
+                </div>
+
+                <!-- Marker: Conviction (Medium) -->
+                <div class="spec-marker m-conviction" data-pos="54%">
+                  <span class="spec-marker-name">Conviction</span>
+                  <span class="spec-marker-tag med">Medium</span>
+                  <div class="spec-dot-wrap">
+                    <span class="spec-pulse"></span>
+                    <div class="spec-dot-pip"></div>
+                  </div>
+                </div>
+
+                <!-- Gradient bar -->
+                <div class="spec-bar"></div>
+
+                <!-- Axis labels -->
+                <div class="spec-ticks">
+                  <span class="spec-tick-label">Critical</span>
+                  <span class="spec-tick-label">High</span>
+                  <span class="spec-tick-label">Medium</span>
+                  <span class="spec-tick-label">Low</span>
+                  <span class="spec-tick-label">Resolved</span>
+                </div>
+              </div><!-- /spec-track-wrap -->
+            </div><!-- /severity-spectrum -->
+
             <div class="gap-cards">
               <!-- CLARITY GAP -->
-              <div class="gap-card red-card">
+              <div class="gap-card orange-card">
                 <div class="gap-card-header">
                     <div class="gap-card-titles">
                       <span class="gap-severity">High Severity</span>
@@ -1447,13 +2080,14 @@
                     <span class="gap-row-text">Align exec team on a 2–3 year roadmap with a facilitated offsite.</span>
                   </div>
                 </div>
+                <div class="gap-plan-area" id="gap-plan-clarity"></div>
                 <div class="gap-card-footer">
                   <button class="gap-cta gap-cta-primary" onclick="showPage('askaria')"><svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2l1.8 5.4L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.6z"/></svg>Ask Aria</button>
-                  <button class="gap-cta gap-cta-secondary">Generate Plan</button>
+                  <button class="gap-cta gap-cta-secondary" id="gap-btn-clarity" onclick="generateGapPlan(this,'clarity')">Generate Plan</button>
                 </div>
               </div>
               <!-- CAPABILITY GAP -->
-              <div class="gap-card yellow-card">
+              <div class="gap-card red-card">
                 <div class="gap-card-header">
                     <div class="gap-card-titles">
                       <span class="gap-severity">Critical</span>
@@ -1471,9 +2105,10 @@
                     <span class="gap-row-text">Hire CDO by Q3 and begin data infrastructure build-out ($3.2M Phase 1).</span>
                   </div>
                 </div>
+                <div class="gap-plan-area" id="gap-plan-capability"></div>
                 <div class="gap-card-footer">
                   <button class="gap-cta gap-cta-primary" onclick="showPage('askaria')"><svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2l1.8 5.4L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.6z"/></svg>Ask Aria</button>
-                  <button class="gap-cta gap-cta-secondary">Generate Plan</button>
+                  <button class="gap-cta gap-cta-secondary" id="gap-btn-capability" onclick="generateGapPlan(this,'capability')">Generate Plan</button>
                 </div>
               </div>
               <!-- CONVICTION GAP -->
@@ -1495,9 +2130,10 @@
                     <span class="gap-row-text">Brief remaining board members on OEM competitive threat before next vote.</span>
                   </div>
                 </div>
+                <div class="gap-plan-area" id="gap-plan-conviction"></div>
                 <div class="gap-card-footer">
                   <button class="gap-cta gap-cta-primary" onclick="showPage('askaria')"><svg width="11" height="11" viewBox="0 0 20 20" fill="currentColor"><path d="M10 2l1.8 5.4L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.6z"/></svg>Ask Aria</button>
-                  <button class="gap-cta gap-cta-secondary">Generate Plan</button>
+                  <button class="gap-cta gap-cta-secondary" id="gap-btn-conviction" onclick="generateGapPlan(this,'conviction')">Generate Plan</button>
                 </div>
               </div>
             </div>
@@ -1506,13 +2142,106 @@
                 <span class="roadmap-label-icon"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M12 2v3M12 19v3M4.22 4.22l2.12 2.12M17.66 17.66l2.12 2.12M2 12h3M19 12h3M4.22 19.78l2.12-2.12M17.66 6.34l2.12-2.12"/></svg></span>
                 <span class="roadmap-label-text">Transformation Roadmap</span>
               </div>
-              <div class="tl-item"><div class="tl-line"></div><div class="tl-dot done"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg></div><div><div class="tl-title">Executive Alignment Workshop completed</div><div class="tl-date">Oct 2024</div></div></div>
-              <div class="tl-item"><div class="tl-line"></div><div class="tl-dot inprog"><svg width="14" height="14" viewBox="0 0 20 20" fill="currentColor"><path fill-rule="evenodd" d="M10.293 3.293a1 1 0 011.414 0l6 6a1 1 0 010 1.414l-6 6a1 1 0 01-1.414-1.414L14.586 11H3a1 1 0 110-2h11.586l-4.293-4.293a1 1 0 010-1.414z"/></svg></div><div><div class="tl-title">Chief Digital Officer hired and onboarded</div><div class="tl-date">May 2026 — In Progress</div></div></div>
-              <div class="tl-item"><div class="tl-line"></div><div class="tl-dot pending">3</div><div><div class="tl-title">Data Infrastructure Phase 1 complete ($3.2M)</div><div class="tl-date">Sep 2026</div></div></div>
-              <div class="tl-item"><div class="tl-line"></div><div class="tl-dot pending">4</div><div><div class="tl-title">First connected vehicle pilot with OEM partner</div><div class="tl-date">Dec 2026</div></div></div>
-              <div class="tl-item"><div class="tl-line"></div><div class="tl-dot pending">5</div><div><div class="tl-title">Full capability program launched</div><div class="tl-date">Apr 2027</div></div></div>
-              <div class="tl-item"><div class="tl-dot pending">6</div><div><div class="tl-title">Connected vehicle data revenue target reached</div><div class="tl-date">Dec 2027</div></div></div>
+
+              <div class="vtl-wrap">
+                <div class="vtl-axis"></div>
+
+                <!-- 1 — Done -->
+                <div class="vtl-item vtl-done">
+                  <div class="vtl-left"><span class="vtl-date">Oct 2024</span></div>
+                  <div class="vtl-dot-col">
+                    <div class="vtl-dot-done">
+                      <svg width="14" height="14" viewBox="0 0 20 20" fill="rgba(255,255,255,0.95)"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                    </div>
+                  </div>
+                  <div class="vtl-content">
+                    <span class="vtl-tag done">Completed</span>
+                    <div class="vtl-title">Executive Alignment Workshop</div>
+                    <div class="vtl-desc">C-suite aligned on a 2–3 year connected vehicle timeline. Digital readiness baseline established at 23/100.</div>
+                  </div>
+                </div>
+
+                <!-- 2 — Done -->
+                <div class="vtl-item vtl-done">
+                  <div class="vtl-left"><span class="vtl-date">Jan 2025</span></div>
+                  <div class="vtl-dot-col">
+                    <div class="vtl-dot-done">
+                      <svg width="14" height="14" viewBox="0 0 20 20" fill="rgba(255,255,255,0.95)"><path fill-rule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z"/></svg>
+                    </div>
+                  </div>
+                  <div class="vtl-content">
+                    <span class="vtl-tag done">Completed</span>
+                    <div class="vtl-title">90-Day Digital Health Check-in</div>
+                    <div class="vtl-desc">First formal review post-baseline. Strategy lifted to A2. Leadership aligned on digital investment case.</div>
+                  </div>
+                </div>
+
+                <!-- 3 — In Progress -->
+                <div class="vtl-item vtl-inprog">
+                  <div class="vtl-left"><span class="vtl-date">May 2026</span></div>
+                  <div class="vtl-dot-col">
+                    <div class="vtl-dot-inprog">
+                      <div class="vtl-pulse-ring"></div>
+                      <svg width="10" height="10" viewBox="0 0 20 20" fill="rgba(255,255,255,0.95)"><circle cx="10" cy="10" r="5"/></svg>
+                    </div>
+                  </div>
+                  <div class="vtl-content">
+                    <span class="vtl-tag inprog">In Progress</span>
+                    <div class="vtl-title">Chief Digital Officer Hired & Onboarded</div>
+                    <div class="vtl-desc">Final-round candidate in assessment. CDO appointment expected to unlock score improvement across all four dimensions within 60 days of onboarding.</div>
+                  </div>
+                </div>
+
+                <!-- 4 — Pending -->
+                <div class="vtl-item vtl-pending">
+                  <div class="vtl-left"><span class="vtl-date">Sep 2026</span></div>
+                  <div class="vtl-dot-col"><div class="vtl-dot-pending"></div></div>
+                  <div class="vtl-content">
+                    <span class="vtl-tag">Upcoming</span>
+                    <div class="vtl-title">Data Infrastructure Phase 1 Complete</div>
+                    <div class="vtl-desc">$3.2M investment in connected vehicle data pipeline. Required for OEM partner integration readiness by Q4 2026.</div>
+                  </div>
+                </div>
+
+                <!-- 5 — Pending -->
+                <div class="vtl-item vtl-pending">
+                  <div class="vtl-left"><span class="vtl-date">Dec 2026</span></div>
+                  <div class="vtl-dot-col"><div class="vtl-dot-pending"></div></div>
+                  <div class="vtl-content">
+                    <span class="vtl-tag">Upcoming</span>
+                    <div class="vtl-title">First Connected Vehicle Pilot with OEM Partner</div>
+                    <div class="vtl-desc">Live data exchange with Tier 1 OEM partner. Proof point for the full commercial programme launch.</div>
+                  </div>
+                </div>
+
+                <!-- 6 — Pending -->
+                <div class="vtl-item vtl-pending">
+                  <div class="vtl-left"><span class="vtl-date">Dec 2027</span></div>
+                  <div class="vtl-dot-col"><div class="vtl-dot-pending"></div></div>
+                  <div class="vtl-content">
+                    <span class="vtl-tag">Upcoming</span>
+                    <div class="vtl-title">Connected Vehicle Data Revenue Target Reached</div>
+                    <div class="vtl-desc">Full capability programme operational. Recurring data revenue stream from OEM partnerships established.</div>
+                  </div>
+                </div>
+
+              </div><!-- /vtl-wrap -->
             </div>
+
+            <!-- ASK ARIA SHORTCUT -->
+            <div class="aria-shortcut-row">
+              <div class="aria-shortcut-orb-wrap" data-aria-avatar-size="52"></div>
+              <div class="aria-shortcut-divider"></div>
+              <div class="aria-shortcut-content">
+                <div class="aria-shortcut-label">Have a question about this engagement?</div>
+                <div class="aria-shortcut-chips">
+                  <button class="aria-chip" data-question="What's the biggest risk right now?">What's the biggest risk right now?</button>
+                  <button class="aria-chip" data-question="How did we close the Clarity gap?">How did we close the Clarity gap?</button>
+                  <button class="aria-chip" data-question="What's Aria's view on the Ford OEM timeline?">What's Aria's view on the Ford OEM timeline?</button>
+                </div>
+              </div>
+            </div>
+
           </div>
         </div>
 
@@ -2253,7 +2982,8 @@
 
   <script>
   function replayAnimations(page) {
-    var els = page.querySelectorAll('.dim-bar, .donut-arc, .roadmap-item, .tl-item, .sparkline-path');
+    var els = page.querySelectorAll('.dim-bar, .donut-arc, .roadmap-item, .vtl-item, .vtl-axis, .sparkline-path');
+    if (page.id === 'page-project') { animateSpectrum(); runCountUp(); }
     els.forEach(function(el) {
       el.style.animation = 'none';
       el.offsetHeight;
@@ -2404,6 +3134,7 @@
     page.classList.add('active');
     replayAnimations(page);
     if (id === 'health') { setTimeout(runInsightTypewriter, 300); }
+    if (id === 'dashboard') { setTimeout(runDashTypewriter, 300); }
     if (id === 'askaria') {
       requestAnimationFrame(function() {
         triggerOrbFirstVisit();
@@ -2574,7 +3305,10 @@
 
     // Replay animations on initial load
     var activePage = document.querySelector('.page.active');
-    if (activePage) replayAnimations(activePage);
+    if (activePage) {
+      replayAnimations(activePage);
+      if (activePage.id === 'page-project') { setTimeout(animateSpectrum, 200); setTimeout(runCountUp, 300); }
+    }
 
     // Trigger insight typewriter if health page is active on load
     if (activePage && activePage.id === 'page-health') {
@@ -2597,6 +3331,28 @@
     // Calendar dates: always relative to today
     updateCalendarDates();
     initKnowledgeCapabilities();
+
+    // ── Mission Control: CDO hire countdown ──
+    (function() {
+      var el = document.getElementById('mc-cdo-days');
+      if (!el) return;
+      var deadline = new Date('2026-05-31T23:59:59');
+      function tick() {
+        var now = new Date();
+        var diff = deadline - now;
+        if (diff <= 0) {
+          el.textContent = '0';
+          el.classList.add('urgent');
+          return;
+        }
+        var days = Math.ceil(diff / (1000 * 60 * 60 * 24));
+        el.textContent = days;
+        if (days <= 14) el.classList.add('urgent');
+        else el.classList.remove('urgent');
+      }
+      tick();
+      setInterval(tick, 60000);
+    })();
   });
 </script>
     <script type="module" src="/app.js"></script>
@@ -2735,6 +3491,218 @@
     nextBtn.addEventListener('click', () => goTo(current + 1));
     goTo(0);
   })();
+
+  // ── Ask Aria shortcut chips ──
+  function askAriaQuestion(question) {
+    showPage('askaria');
+    setTimeout(function() {
+      var input = document.getElementById('message-input');
+      if (!input) return;
+      input.value = question;
+      input.focus();
+      input.dispatchEvent(new Event('input'));
+    }, 180);
+  }
+  document.addEventListener('click', function(e) {
+    var chip = e.target.closest('.aria-chip[data-question]');
+    if (chip) askAriaQuestion(chip.dataset.question);
+  });
+
+  // ── Banner stat count-up ──
+  function runCountUp() {
+    var els = document.querySelectorAll('[data-countup]');
+    els.forEach(function(el) {
+      var target  = parseInt(el.dataset.countup, 10);
+      var suffix  = el.dataset.suffix || '';
+      var duration = target <= 12 ? 900 : 1100; // shorter for small numbers
+      var start   = null;
+      function step(ts) {
+        if (!start) start = ts;
+        var progress = Math.min((ts - start) / duration, 1);
+        // ease out cubic
+        var eased = 1 - Math.pow(1 - progress, 3);
+        el.textContent = Math.round(eased * target) + suffix;
+        if (progress < 1) requestAnimationFrame(step);
+        else el.textContent = target + suffix;
+      }
+      requestAnimationFrame(step);
+    });
+  }
+
+  // ── Three Cs Severity Spectrum animation ──
+  function animateSpectrum() {
+    var track = document.getElementById('spec-track');
+    if (!track) return;
+    var markers = track.querySelectorAll('.spec-marker');
+    // Reset first (handles re-entry when navigating back)
+    markers.forEach(function(m) {
+      m.style.transition = 'none';
+      m.style.left = '0%';
+      m.style.opacity = '0';
+    });
+    // Force reflow then animate
+    track.getBoundingClientRect();
+    markers.forEach(function(m, i) {
+      setTimeout(function() {
+        m.style.transition = 'left 1s cubic-bezier(0.4,0,0.2,1), opacity 0.45s ease';
+        m.style.left  = m.dataset.pos;
+        m.style.opacity = '1';
+      }, 120 + i * 220);
+    });
+  }
+
+  // ── Gap Card: Generate Plan ──
+  const GAP_PLANS = {
+    clarity: [
+      {
+        title: 'Facilitate the Executive Alignment Offsite',
+        desc:  'Schedule a half-day facilitated session with Meridian\'s full C-suite within the next 30 days. Present OEM data readiness benchmarks alongside Meridian\'s 29/100 score. Deliverable: a signed, single-page strategic intent document committing every executive to the 2–3 year CVCP timeline.'
+      },
+      {
+        title: 'Deploy a Live Transformation Scorecard',
+        desc:  'Stand up a shared dashboard — visible to all ExCo members by end of May 2026 — that ties each dimension (Strategy, People, Process, Tech) to a named executive owner. When every leader sees the same number in real time, misalignment dissolves. Ambiguity lives in the dark; clarity lives in data.'
+      },
+      {
+        title: 'Use the CDO Hire as a Clarity Forcing Function',
+        desc:  'The incoming CDO (target: May 2026) becomes the natural anchor for shared alignment. Structure the 30-60-90 day onboarding as a "Clarity Sprint": each milestone resets stakeholder expectations to a single, data-driven timeline. First output: a board-ready transformation narrative, authored by the CDO, within 90 days of start date.'
+      }
+    ],
+    capability: [
+      {
+        title: 'Escalate the CDO Search — This Week',
+        desc:  'The Spencer Stuart search is 16 days past Meridian\'s internal deadline. Every week without a CDO costs approximately $180K in delayed programme value. Aria recommends direct CEO escalation: accelerate final-round decisions or expand the shortlist by Friday. The CDO hire is the single highest-leverage action available right now.'
+      },
+      {
+        title: 'Activate Phase 1 Infrastructure Within 60 Days of CDO Start',
+        desc:  'With CDO in seat, release the $3.2M Phase 1 budget immediately. First critical hire: a Senior Data Architect to design the connected vehicle telemetry pipeline. OEM partner readiness requires A4 across the Tech dimension by Q4 2026 — the architecture decision cannot wait for a full team to be assembled.'
+      },
+      {
+        title: 'Commission a Rapid Asset Audit Before the CDO Arrives',
+        desc:  'Run a 3-week internal audit of existing data assets, tooling, and vendor contracts before the CDO\'s first day. This prevents a standing-start delay and gives the new leader a ready brief on Day 1. Target: first capability review presented to the board within 90 days of CDO onboarding.'
+      }
+    ],
+    conviction: [
+      {
+        title: 'Brief the Two Uncommitted Board Members — Before June',
+        desc:  'Aria has identified that two board members remain unfamiliar with the OEM digital requirements shift arriving in 2026–2027. Schedule individual 45-minute briefings before the June planning cycle, using the \'OEM Competitive Threat\' document already prepared. Make the risk concrete: without readiness, Meridian risks losing Tier 1 partner status by 2027.'
+      },
+      {
+        title: 'Reframe the Investment for the CFO as Three Stage-Gated Tranches',
+        desc:  'The CFO\'s hesitation is about return timeline, not the investment itself. Reframe the $12M as three tranches with stage-gate returns: Phase 1 infrastructure ($3.2M) unlocks the OEM pilot; pilot data revenue offsets Phase 2 costs; Phase 3 becomes self-funding. A break-even model showing payback within 24 months of CDO hire changes the conversation from cost to ROI.'
+      },
+      {
+        title: 'Create a Live Conviction Moment at the Next Board Session',
+        desc:  'Bring a live demo of the Aria advisor platform to the next board meeting. Show — not tell — what connected vehicle data intelligence looks like in practice. Judges and board members alike respond to seeing, not reading. A 10-minute live session with Aria answering real questions about Meridian\'s programme will do more for conviction than any slide deck.'
+      }
+    ]
+  };
+
+  const _gapState = {};
+
+  function generateGapPlan(btn, gapType) {
+    if (_gapState[gapType] === 'running') return;
+
+    const area = document.getElementById('gap-plan-' + gapType);
+    if (!area) return;
+
+    // If already done, reset
+    if (_gapState[gapType] === 'done') {
+      _gapState[gapType] = null;
+      area.classList.remove('open');
+      area.innerHTML = '';
+      btn.className = 'gap-cta gap-cta-secondary';
+      btn.innerHTML = 'Generate Plan';
+      return;
+    }
+
+    _gapState[gapType] = 'running';
+    btn.className = 'gap-cta gap-cta-secondary generating';
+    btn.innerHTML = '<div class="gap-spin"></div> Generating…';
+
+    const steps = GAP_PLANS[gapType];
+
+    // Build skeleton structure immediately
+    const inner = document.createElement('div');
+    inner.className = 'gap-plan-inner';
+    inner.innerHTML = `
+      <div class="gap-plan-header">
+        <div class="gap-plan-header-dot">
+          <svg width="9" height="9" viewBox="0 0 20 20" fill="#2563eb"><path d="M10 2l1.8 5.4L17 9l-5.2 1.8L10 16l-1.8-5.2L3 9l5.2-1.6z"/></svg>
+        </div>
+        Aria's 3-Step Action Plan
+      </div>
+      ${steps.map((s, i) => `
+        <div class="gap-plan-step" id="gap-step-${gapType}-${i}">
+          <div class="gap-plan-step-num">${i + 1}</div>
+          <div class="gap-plan-step-body">
+            <div class="gap-plan-step-title" id="gap-title-${gapType}-${i}"></div>
+            <div class="gap-plan-step-desc"  id="gap-desc-${gapType}-${i}"></div>
+          </div>
+        </div>`).join('')}
+    `;
+    area.innerHTML = '';
+    area.appendChild(inner);
+
+    // Small delay before opening for the spinner moment
+    setTimeout(function() {
+      area.classList.add('open');
+
+      // Typewrite each step sequentially
+      let stepIdx = 0;
+      function typeStep(idx) {
+        if (idx >= steps.length) {
+          // All done
+          _gapState[gapType] = 'done';
+          btn.className = 'gap-cta gap-cta-secondary done-state';
+          btn.innerHTML = '✓ Reset';
+          return;
+        }
+        const step = steps[idx];
+        const titleEl = document.getElementById('gap-title-' + gapType + '-' + idx);
+        const descEl  = document.getElementById('gap-desc-'  + gapType + '-' + idx);
+
+        // Type title first
+        typeText(titleEl, step.title, 28, function() {
+          // Small pause, then type description
+          setTimeout(function() {
+            typeText(descEl, step.desc, 12, function() {
+              setTimeout(function() { typeStep(idx + 1); }, 180);
+            });
+          }, 120);
+        });
+      }
+      typeStep(0);
+    }, 600);
+  }
+
+  // ── Dashboard opener typewriter ──────────────────────────────────────────────
+  var dashTyped = false;
+  function runDashTypewriter() {
+    if (dashTyped) return;
+    dashTyped = true;
+    var el = document.getElementById('aria-briefing-text');
+    if (!el) return;
+    var OPENER = "CDO Hired \u0026 Onboarded is still the milestone that will determine whether the rest of Meridian\u2019s roadmap moves on time. What feels most at risk right now?";
+    typeText(el, OPENER, 22, null);
+  }
+
+  function typeText(el, text, speed, onDone) {
+    el.innerHTML = '';
+    const cursor = document.createElement('span');
+    cursor.className = 'tw-cursor';
+    el.appendChild(cursor);
+    let i = 0;
+    const iv = setInterval(function() {
+      if (i < text.length) {
+        el.insertBefore(document.createTextNode(text[i]), cursor);
+        i++;
+      } else {
+        clearInterval(iv);
+        el.removeChild(cursor);
+        if (onDone) onDone();
+      }
+    }, speed);
+  }
   </script>
   </body>
 </html>
