@@ -948,7 +948,10 @@ function loadSessionOpener() {
 
   const textEl = document.getElementById("aria-briefing-text");
   if (!textEl) return;
-  textEl.textContent = SESSION_OPENER_TEXT;
+  textEl.textContent = '';
+  setTimeout(function() {
+    if (typeof runDashTypewriter === 'function') runDashTypewriter();
+  }, 500);
 }
 
 loadSessionOpener();
